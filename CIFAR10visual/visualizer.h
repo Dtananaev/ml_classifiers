@@ -14,15 +14,17 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-
+#include "ui_visualizer.h"
+/*
 namespace Ui {
 class visualizer;
 }
-
-class visualizer : public QMainWindow
+*/
+class visualizer : public QMainWindow, private Ui_visualizer
 {
     Q_OBJECT
-
+public slots:
+    void showImage();
 public:
     explicit visualizer(QWidget *parent = 0);
     ~visualizer();
@@ -32,7 +34,7 @@ public:
 private:    
     Ui::visualizer *ui;
     std::vector<int> labels;
-    std::vector< std::vector<unsigned char> > images; 
+    std::vector< std::vector<int> > images; 
 
 };
 

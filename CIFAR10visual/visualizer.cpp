@@ -7,15 +7,18 @@
  */
 
 #include "visualizer.h"
-#include "ui_visualizer.h"
 
-visualizer::visualizer(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::visualizer)
+
+visualizer::visualizer(QWidget *parent):  QMainWindow(parent)
+    //ui(new Ui::visualizer)
 {
-    ui->setupUi(this);
+    
+        // this sets up GUI   
+     setupUi(this); 
+//ui->setupUi(this);
 
-
+    //show picture button
+    connect(showPicture, SIGNAL(clicked()), this, SLOT(showImage()));
 //   QImage myImage(Data,32,32,QImage::Format_RGB16);
  //  QLabel myLabel;
  //  myLabel.setPixmap(QPixmap::fromImage(myImage));
@@ -25,7 +28,35 @@ visualizer::visualizer(QWidget *parent) :
 
 visualizer::~visualizer()
 {
-    delete ui;
+  //  delete ui;
+}
+void visualizer::showImage(){
+    //check the number of image in the box
+      int index=numberBox->value();
+       std::cout<<"index "<<index<<"\n";
+   // unsigned char* Data = (unsigned char*)&images[index];
+
+     //   for(int i=0; i<images[index].size();i++){
+  //        std::cout<<"images "<<images[index][i]<<"\n";
+
+    //   }
+
+
+     QImage img(32, 32, QImage::Format_RGB888);
+    for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+        int red=images[index][y*32+x];
+        int green=images[index][1024+y*32+x];
+        int blue=images[index][2048+y*32+x];
+      img.setPixel(x, y, qRgb(red, green, blue));
+    }
+  }
+  
+   //QImage myImage(Data,32,32,QImage::Format_RGB16);
+// QImage myImage((unsigned char*)&images[index],32,32,QImage::Format_RGB888);
+   //QLabel labelPicture;
+   labelPicture->setPixmap(QPixmap::fromImage(img));
+   labelPicture->show();
 }
 
 bool visualizer::readCFAR(const char* filename){
@@ -47,7 +78,7 @@ bool visualizer::readCFAR(const char* filename){
          //   std::cout<< "vec size "<<labels.size()<<"\n";
         //    std::cout<< "label "<<(int)tplabel<<"\n";
        // std::cin.get();
-            std::vector<uchar> picture; 
+            std::vector<int> picture; 
             for(int channel = 0; channel < 3; ++channel){
              
                 // temporal vector 

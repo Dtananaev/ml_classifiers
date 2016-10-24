@@ -7,6 +7,11 @@ int main(int argc, char *argv[])
     visualizer w;
     w.readCFAR("CIFAR10/data_batch_2.bin");
     w.show();
-    
+
+    while (w.isVisible()) {
+
+        a.processEvents();
+    }
+
     return a.exec();
 }

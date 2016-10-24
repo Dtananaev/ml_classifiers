@@ -14,20 +14,20 @@
    <string>visualizer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QPushButton" name="showPicture">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>60</y>
-      <width>99</width>
+      <x>268</x>
+      <y>40</y>
+      <width>141</width>
       <height>27</height>
      </rect>
     </property>
     <property name="text">
-     <string>readData</string>
+     <string>Show Picture</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label">
+   <widget class="QLabel" name="labelPicture">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -37,7 +37,17 @@
      </rect>
     </property>
     <property name="text">
-     <string>TextLabel</string>
+     <string/>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="numberBox">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>10</y>
+      <width>141</width>
+      <height>27</height>
+     </rect>
     </property>
    </widget>
   </widget>
