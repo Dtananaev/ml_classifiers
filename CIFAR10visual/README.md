@@ -4,7 +4,7 @@ To download CIFAR10 dataset use:
 
   ./get_datasets.sh
 
-It will upload end extract files in CIFAR10 folder.
+It will upload and extract files in CIFAR10 folder.
 
 Building
 ========

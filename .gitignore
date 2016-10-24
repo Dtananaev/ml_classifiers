@@ -1,2 +1,4 @@
 *~
 CIFAR10/
+**build/
+*.user
