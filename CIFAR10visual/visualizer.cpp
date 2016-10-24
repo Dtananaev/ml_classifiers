@@ -51,6 +51,11 @@ void visualizer::init(){
 }
 
 void visualizer::updateImage(){
+    if( numberBox->value()>=60000){
+
+        numberBox->setValue(59999);
+    }
+
   int index=numberBox->value();
     
      QImage img(32, 32, QImage::Format_RGB888);
