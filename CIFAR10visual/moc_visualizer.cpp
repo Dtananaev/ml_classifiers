@@ -36,7 +36,7 @@ static const uint qt_meta_data_visualizer[] = {
 };
 
 static const char qt_meta_stringdata_visualizer[] = {
-    "visualizer\0\0showImage()\0"
+    "visualizer\0\0updateImage()\0"
 };
 
 void visualizer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -45,7 +45,7 @@ void visualizer::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         Q_ASSERT(staticMetaObject.cast(_o));
         visualizer *_t = static_cast<visualizer *>(_o);
         switch (_id) {
-        case 0: _t->showImage(); break;
+        case 0: _t->updateImage(); break;
         default: ;
         }
     }

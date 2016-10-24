@@ -24,17 +24,21 @@ class visualizer : public QMainWindow, private Ui_visualizer
 {
     Q_OBJECT
 public slots:
-    void showImage();
+   
+    void updateImage();
 public:
     explicit visualizer(QWidget *parent = 0);
     ~visualizer();
-
+    void init();
     bool readCFAR(const char* filename);
 
 private:    
-    Ui::visualizer *ui;
+    ///Ui::visualizer *ui;
     std::vector<int> labels;
     std::vector< std::vector<int> > images; 
+    std::vector<std::string> categories;
+
+
 
 };
 

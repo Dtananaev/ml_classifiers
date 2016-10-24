@@ -9,40 +9,33 @@
 #include "visualizer.h"
 
 
-visualizer::visualizer(QWidget *parent):  QMainWindow(parent)
-    //ui(new Ui::visualizer)
-{
-    
-        // this sets up GUI   
+visualizer::visualizer(QWidget *parent):  QMainWindow(parent){    
+      // this sets up GUI   
      setupUi(this); 
-//ui->setupUi(this);
-
-    //show picture button
-    connect(showPicture, SIGNAL(clicked()), this, SLOT(showImage()));
-//   QImage myImage(Data,32,32,QImage::Format_RGB16);
- //  QLabel myLabel;
- //  myLabel.setPixmap(QPixmap::fromImage(myImage));
+    connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
 }
 
 
 
-visualizer::~visualizer()
-{
-  //  delete ui;
+visualizer::~visualizer(){
 }
-void visualizer::showImage(){
-    //check the number of image in the box
-      int index=numberBox->value();
-       std::cout<<"index "<<index<<"\n";
-   // unsigned char* Data = (unsigned char*)&images[index];
+void visualizer::init(){
+//fill the cathegory names
+    categories.push_back("airplane");
+    categories.push_back("automobile");
+    categories.push_back("bird");
+    categories.push_back("cat");
+    categories.push_back("deer");
+    categories.push_back("dog");
+    categories.push_back("frog");
+    categories.push_back("horse");
+    categories.push_back("ship");
+    categories.push_back("truck");
 
-     //   for(int i=0; i<images[index].size();i++){
-  //        std::cout<<"images "<<images[index][i]<<"\n";
 
-    //   }
-
-
-     QImage img(32, 32, QImage::Format_RGB888);
+    //show the first picture in dataset
+  int index=0;
+  QImage img(32, 32, QImage::Format_RGB888);
     for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
         int red=images[index][y*32+x];
@@ -52,12 +45,28 @@ void visualizer::showImage(){
     }
   }
   
-   //QImage myImage(Data,32,32,QImage::Format_RGB16);
-// QImage myImage((unsigned char*)&images[index],32,32,QImage::Format_RGB888);
-   //QLabel labelPicture;
     img=img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
    labelPicture->setPixmap(QPixmap::fromImage(img));
    labelPicture->show();
+   lineEdit->setText(QString::fromUtf8(categories[labels[index]].c_str()));
+}
+
+void visualizer::updateImage(){
+  int index=numberBox->value();
+    
+     QImage img(32, 32, QImage::Format_RGB888);
+    for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+        int red=images[index][y*32+x];
+        int green=images[index][1024+y*32+x];
+        int blue=images[index][2048+y*32+x];
+      img.setPixel(x, y, qRgb(red, green, blue));
+    }
+  }
+    img=img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
+   labelPicture->setPixmap(QPixmap::fromImage(img));
+   labelPicture->show();
+   lineEdit->setText(QString::fromUtf8(categories[labels[index]].c_str()));
 }
 
 bool visualizer::readCFAR(const char* filename){
@@ -76,32 +85,24 @@ bool visualizer::readCFAR(const char* filename){
             file.read((char*) &tplabel, sizeof(tplabel));
             //push to the vector of labels
             labels.push_back((int)tplabel);
-         //   std::cout<< "vec size "<<labels.size()<<"\n";
-        //    std::cout<< "label "<<(int)tplabel<<"\n";
-       // std::cin.get();
+ 
             std::vector<int> picture; 
             for(int channel = 0; channel < 3; ++channel){
              
-                // temporal vector 
-               // std::vector<int> ch; 
+           
                 for(int x = 0; x < n_rows; ++x){
                     for(int y = 0; y < n_cols; ++y){
                        unsigned  char temp = 0;
 
-                        file.read((char*) &temp, sizeof(temp));
-
-                       //std::cout<< "CHAR size "<<(int)temp<<"\n";
-                       picture.push_back((int)temp);
+                        file.read((char*) &temp, sizeof(temp));                  
+                        picture.push_back((int)temp);
                     }
                 }
-               // std::cin.get();
-             //  picture.push_back(ch);
             }
        images.push_back(picture);
 
         }
 
-        std::cout<< "vec size final "<<labels.size()<<"\n";
        file.close();
       return true;
     }  else{ 

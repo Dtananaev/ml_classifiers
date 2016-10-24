@@ -6,52 +6,55 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>307</width>
-    <height>205</height>
+    <width>162</width>
+    <height>265</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>visualizer</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QPushButton" name="showPicture">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
-      <y>30</y>
-      <width>141</width>
-      <height>27</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Show Picture</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="labelPicture">
+   <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>121</width>
-      <height>101</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
-   <widget class="QSpinBox" name="numberBox">
-    <property name="geometry">
-     <rect>
-      <x>160</x>
       <y>0</y>
-      <width>141</width>
-      <height>27</height>
+      <width>148</width>
+      <height>202</height>
      </rect>
     </property>
-    <property name="maximum">
-     <number>60000</number>
-    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>CIFAR10 visualizer</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="numberBox">
+       <property name="maximum">
+        <number>60000</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelPicture">
+       <property name="minimumSize">
+        <size>
+         <width>141</width>
+         <height>111</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="lineEdit"/>
+     </item>
+    </layout>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
@@ -59,7 +62,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>307</width>
+     <width>162</width>
      <height>25</height>
     </rect>
    </property>
