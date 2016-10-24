@@ -130,10 +130,9 @@ bool visualizer::readCFAR(const char* dirname){
     return true;
 }
 
-void visualizer::on_actionLoad_from_folder_triggered()
-{
+void visualizer::on_actionLoad_from_folder_triggered(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-
+  
     if(readCFAR(folder_path.toUtf8().constData())){
         init();
     }

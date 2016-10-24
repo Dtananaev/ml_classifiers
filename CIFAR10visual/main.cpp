@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     visualizer w;
-    if(w.readCFAR("./CIFAR10")){
+    if(w.readCFAR("../CIFAR10")){
         w.init();
     }
 
