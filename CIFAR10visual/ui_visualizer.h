@@ -40,22 +40,23 @@ public:
     {
         if (visualizer->objectName().isEmpty())
             visualizer->setObjectName(QString::fromUtf8("visualizer"));
-        visualizer->resize(431, 222);
+        visualizer->resize(307, 205);
         centralWidget = new QWidget(visualizer);
         centralWidget->setObjectName(QString::fromUtf8("centralWidget"));
         showPicture = new QPushButton(centralWidget);
         showPicture->setObjectName(QString::fromUtf8("showPicture"));
-        showPicture->setGeometry(QRect(268, 40, 141, 27));
+        showPicture->setGeometry(QRect(160, 30, 141, 27));
         labelPicture = new QLabel(centralWidget);
         labelPicture->setObjectName(QString::fromUtf8("labelPicture"));
-        labelPicture->setGeometry(QRect(20, 10, 201, 131));
+        labelPicture->setGeometry(QRect(10, 10, 121, 101));
         numberBox = new QSpinBox(centralWidget);
         numberBox->setObjectName(QString::fromUtf8("numberBox"));
-        numberBox->setGeometry(QRect(270, 10, 141, 27));
+        numberBox->setGeometry(QRect(160, 0, 141, 27));
+        numberBox->setMaximum(60000);
         visualizer->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(visualizer);
         menuBar->setObjectName(QString::fromUtf8("menuBar"));
-        menuBar->setGeometry(QRect(0, 0, 431, 25));
+        menuBar->setGeometry(QRect(0, 0, 307, 25));
         visualizer->setMenuBar(menuBar);
         mainToolBar = new QToolBar(visualizer);
         mainToolBar->setObjectName(QString::fromUtf8("mainToolBar"));

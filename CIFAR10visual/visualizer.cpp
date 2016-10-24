@@ -55,6 +55,7 @@ void visualizer::showImage(){
    //QImage myImage(Data,32,32,QImage::Format_RGB16);
 // QImage myImage((unsigned char*)&images[index],32,32,QImage::Format_RGB888);
    //QLabel labelPicture;
+    img=img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
    labelPicture->setPixmap(QPixmap::fromImage(img));
    labelPicture->show();
 }
