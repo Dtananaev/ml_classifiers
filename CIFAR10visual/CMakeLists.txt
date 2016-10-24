@@ -16,6 +16,7 @@ set  (project_SOURCES main.cpp visualizer.cpp)
 set  (project_HEADERS visualizer.h)
 set  (project_FORMS   visualizer.ui)
 
+
 QT4_WRAP_CPP (project_HEADERS_MOC   ${project_HEADERS})
 QT4_WRAP_UI  (project_FORMS_HEADERS ${project_FORMS})
 

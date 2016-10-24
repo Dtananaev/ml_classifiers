@@ -9,6 +9,13 @@
 #define VISUALIZER_H
 
 #include <QMainWindow>
+#include <QApplication>
+#include <QKeyEvent>
+#include <QMenuBar>
+#include <QFileDialog>
+#include <QString>
+#include <QScrollBar>
+
 #include <QFileDialog>
 #include <QDir>
 #include <stdio.h>      /* printf, fgets */
@@ -19,13 +26,13 @@
 #include "ui_visualizer.h"
 
 
-
 class visualizer : public QMainWindow, private Ui_visualizer
 {
     Q_OBJECT
 public slots:
    
     void updateImage();
+
 public:
     explicit visualizer(QWidget *parent = 0);
     ~visualizer();
@@ -33,7 +40,7 @@ public:
     bool readCFAR(const char* dirname);
 
 private slots:
-    void on_actionLoad_from_folder_triggered();
+    void open();
 
 private:
 

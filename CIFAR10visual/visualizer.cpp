@@ -7,11 +7,34 @@
  */
 
 #include "visualizer.h"
+#include <QMenu>
+#include <QMenuBar>
+visualizer::visualizer(QWidget *parent):  QMainWindow(parent){   
+ 
 
-
-visualizer::visualizer(QWidget *parent):  QMainWindow(parent){    
     // this sets up GUI
     setupUi(this);
+    // File menu
+
+
+menuBar()->setNativeMenuBar(false);// 
+
+  QAction *open = new QAction( "&Open", this);
+  QAction *quit = new QAction( "&Quit", this);
+
+  quit->setShortcut(tr("CTRL+Q"));
+
+  QMenu *file;
+  file = menuBar()->addMenu("&File");
+  file->addAction(open);
+  file->addSeparator();
+  file->addAction(quit);
+ 
+  connect(open, SIGNAL(triggered()), this, SLOT(open()));
+ 
+  connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+
     connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
 }
 
@@ -130,7 +153,7 @@ bool visualizer::readCFAR(const char* dirname){
     return true;
 }
 
-void visualizer::on_actionLoad_from_folder_triggered(){
+void visualizer::open(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
   
     if(readCFAR(folder_path.toUtf8().constData())){
