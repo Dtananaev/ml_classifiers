@@ -18,9 +18,7 @@
 #include <vector>
 #include "ui_visualizer.h"
 
-namespace Ui {
-class visualizer;
-}
+
 
 class visualizer : public QMainWindow, private Ui_visualizer
 {
@@ -38,7 +36,7 @@ private slots:
     void on_actionLoad_from_folder_triggered();
 
 private:
-    Ui::visualizer *ui;
+
     std::vector<int> labels;
     std::vector< std::vector<int> > images; 
     std::vector<std::string> categories;
