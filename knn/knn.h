@@ -32,6 +32,10 @@ class knn : public QMainWindow, private Ui_knn
 public slots:
    
     void updateImage();
+    void updateK();
+    void updateL1();
+    void updateL2();
+    void calculatePerformance();
 
 public:
     explicit knn(QWidget *parent = 0);
@@ -45,6 +49,7 @@ private slots:
     void open();
 
 private:
+    int currentIndex_;
     int k_=1;
     std::vector<int> train_labels;
     std::vector< std::vector<int> > train_images; 

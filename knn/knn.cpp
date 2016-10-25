@@ -7,7 +7,8 @@
  */
 
 #include "knn.h"
-
+#include <limits.h> //INT_MAX
+#include <omp.h>//!!!!uncomment in case if you have installed omp libraries!!!
 knn::knn(QWidget *parent):  QMainWindow(parent){   
  
 
@@ -29,6 +30,11 @@ knn::knn(QWidget *parent):  QMainWindow(parent){
   connect(open, SIGNAL(triggered()), this, SLOT(open()));
   connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
   connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
+  connect(kBox, SIGNAL(valueChanged(int)), this, SLOT(updateK()));
+  connect(L1, SIGNAL(clicked()), this, SLOT(updateL1()));
+  connect(L2, SIGNAL(clicked()), this, SLOT(updateL2()));
+
+  connect(evalButton, SIGNAL(clicked()), this, SLOT(calculatePerformance()));
 }
 
 knn::~knn(){
@@ -50,6 +56,7 @@ void knn::init(){
 
   //show the first picture in dataset
   int index=0;
+  currentIndex_=index;
   QImage img(32, 32, QImage::Format_RGB888);
     for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
@@ -66,7 +73,31 @@ void knn::init(){
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 //knn recognition
     int knn_label= knnDistance(index);
-    lineEdit_2->setText(QString::fromUtf8(categories[train_labels[knn_label]].c_str()));
+    lineEdit_2->setText(QString::fromUtf8(categories[knn_label].c_str()));
+}
+
+void knn::updateK(){
+
+//knn recognition
+    int knn_label= knnDistance(currentIndex_);
+    lineEdit_2->setText(QString::fromUtf8(categories[knn_label].c_str()));
+
+}
+
+void knn::updateL1(){
+
+    if(L1->isChecked()){
+     int knn_label= knnDistance(currentIndex_);
+    lineEdit_2->setText(QString::fromUtf8(categories[knn_label].c_str()));
+  }
+
+}
+
+void knn::updateL2(){
+ if(L2->isChecked()){
+  int knn_label= knnDistance(currentIndex_);
+    lineEdit_2->setText(QString::fromUtf8(categories[knn_label].c_str()));
+}
 }
 
 void knn::updateImage(){
@@ -76,7 +107,7 @@ void knn::updateImage(){
     }
 
   int index=numberBox->value();
-    
+  currentIndex_=index;
      QImage img(32, 32, QImage::Format_RGB888);
     for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
@@ -94,7 +125,28 @@ void knn::updateImage(){
 //knn recognition
     int knn_label= knnDistance(index);
 
-    lineEdit_2->setText(QString::fromUtf8(categories[train_labels[knn_label]].c_str()));
+    lineEdit_2->setText(QString::fromUtf8(categories[knn_label].c_str()));
+}
+
+void knn::calculatePerformance(){
+
+
+    float acc=0;
+// for(int i=0; i<test_labels.size();i++){
+ for(int i=0; i<100;i++){
+          int prediction=knnDistance(i);
+
+        acc+= prediction == test_labels[i];
+std::cout<<"acc "<<acc<<"\n";
+    }
+
+    //acc=acc/test_labels.size();
+
+    acc=acc/100;
+std::cout<<"final acc "<<acc<<"\n";
+ //   lineEdit_3->setText(acc);
+
+accResult->setText(QString::number(acc));
 }
 
 bool knn::trainSetread(const char* dirname){
@@ -166,7 +218,7 @@ int  knn::knnDistance(int test_picture_index){
         int n_cols = 32;
 
         distances.resize(number_of_images);
-
+#pragma omp parallel for//!!!!uncomment in case if you have installed omp libraries!!!
     for(int i = 0; i < number_of_images; ++i)
         {
             int dist=0;
@@ -191,11 +243,24 @@ int  knn::knnDistance(int test_picture_index){
             distances[i]=dist;
         }
 
+    std::vector<int> labels;
+    labels.resize(k_);
 
-  int min_index = std::min_element(distances.begin(), distances.end())- distances.begin();
+    //first k distances
+    for (int d=0;d<k_;d++){
+        int min_index = std::min_element(distances.begin(), distances.end())- distances.begin();
+        labels[d]= train_labels[min_index];
+        distances[min_index]=INT_MAX;//replace the minimum distance with bigest value 
+    }
 
+//find mode of labels
+    std::vector<int> histogram(10,0);
+    for( int i=0; i<labels.size(); ++i ){
+           histogram[ labels[i] ]+=1;
+    }
 
-return min_index;
+return std::max_element( histogram.begin(), histogram.end() ) - histogram.begin();
+
 }
 
 bool knn::testSetread(const char* dirname){
