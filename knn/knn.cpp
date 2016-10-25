@@ -134,12 +134,14 @@ void knn::calculatePerformance(){
     float acc=0;
 // for(int i=0; i<test_labels.size();i++){
  for(int i=0; i<100;i++){
+
+    progressBar->setValue(i);
           int prediction=knnDistance(i);
 
         acc+= prediction == test_labels[i];
-std::cout<<"acc "<<acc<<"\n";
+//std::cout<<"acc "<<acc<<"\n";
     }
-
+    progressBar->setValue(100);
     //acc=acc/test_labels.size();
 
     acc=acc/100;

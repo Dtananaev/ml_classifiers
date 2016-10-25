@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>425</width>
-    <height>243</height>
+    <width>288</width>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,16 +17,13 @@
    <widget class="QWidget" name="">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>409</width>
-      <height>186</height>
+      <x>20</x>
+      <y>30</y>
+      <width>251</width>
+      <height>181</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <property name="bottomMargin">
-      <number>0</number>
-     </property>
      <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="label">
        <property name="text">
@@ -48,31 +45,14 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="0" colspan="2">
+     <item row="1" column="0" rowspan="2" colspan="2">
       <widget class="QSpinBox" name="numberBox">
        <property name="maximum">
         <number>60000</number>
        </property>
       </widget>
      </item>
-     <item row="1" column="3" colspan="2">
-      <widget class="QRadioButton" name="L1">
-       <property name="text">
-        <string>L1</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="5">
-      <widget class="QRadioButton" name="L2">
-       <property name="text">
-        <string>L2</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" rowspan="2" colspan="2">
+     <item row="3" column="0">
       <widget class="QLabel" name="labelPicture">
        <property name="maximumSize">
         <size>
@@ -82,30 +62,6 @@
        </property>
        <property name="text">
         <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="3">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>k:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="4" colspan="2">
-      <widget class="QSpinBox" name="kBox">
-       <property name="minimum">
-        <number>1</number>
-       </property>
-       <property name="singleStep">
-        <number>1</number>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="3" rowspan="2" colspan="3">
-      <widget class="QPushButton" name="evalButton">
-       <property name="text">
-        <string>Evaluate acc.</string>
        </property>
       </widget>
      </item>
@@ -140,6 +96,54 @@
       <widget class="QLabel" name="accResult">
        <property name="text">
         <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QRadioButton" name="L1">
+       <property name="text">
+        <string>L1</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QRadioButton" name="L2">
+       <property name="text">
+        <string>L2</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="3">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>k:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="4">
+      <widget class="QSpinBox" name="kBox">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="3" colspan="2">
+      <widget class="QPushButton" name="evalButton">
+       <property name="text">
+        <string>Evaluate acc.</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3" colspan="2">
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>0</number>
        </property>
       </widget>
      </item>
