@@ -1,7 +1,7 @@
 /*
  * File: visualizer.cpp
  *
- * Author: Denis Tananaev
+ * Authors: Denis Tananaev, Vladislav Tananaev
  *
  * Date: 24.10.2016
  */
