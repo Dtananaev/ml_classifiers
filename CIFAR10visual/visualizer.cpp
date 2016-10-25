@@ -7,21 +7,17 @@
  */
 
 #include "visualizer.h"
-#include <QMenu>
-#include <QMenuBar>
+
 visualizer::visualizer(QWidget *parent):  QMainWindow(parent){   
  
 
     // this sets up GUI
     setupUi(this);
-    // File menu
 
-
-menuBar()->setNativeMenuBar(false);// 
-
+    // File menu   
+   menuBar()->setNativeMenuBar(false);// this line  is necessary for visualization otherwise menu invisible
   QAction *open = new QAction( "&Open", this);
   QAction *quit = new QAction( "&Quit", this);
-
   quit->setShortcut(tr("CTRL+Q"));
 
   QMenu *file;
@@ -31,11 +27,8 @@ menuBar()->setNativeMenuBar(false);//
   file->addAction(quit);
  
   connect(open, SIGNAL(triggered()), this, SLOT(open()));
- 
   connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
-
-
-    connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
+  connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
 }
 
 visualizer::~visualizer(){
@@ -74,9 +67,9 @@ void visualizer::init(){
 }
 
 void visualizer::updateImage(){
-    if( numberBox->value()>=60000){
+    if( numberBox->value()>=images.size()){
 
-        numberBox->setValue(59999);
+        numberBox->setValue(images.size()-1);
     }
 
   int index=numberBox->value();
@@ -146,17 +139,20 @@ bool visualizer::readCFAR(const char* dirname){
             images.push_back(picture);
         }
         file.close();
-
     }
     
-
     return true;
 }
 
 void visualizer::open(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-  
-    if(readCFAR(folder_path.toUtf8().constData())){
-        init();
-    }
+   if(images.size()!=0){
+            std::cout<<"Dataset already uploaded"<<"\n";
+        return;
+        }
+    if(readCFAR(folder_path.toUtf8().constData())){      
+            init();
+       } 
+
+
 }

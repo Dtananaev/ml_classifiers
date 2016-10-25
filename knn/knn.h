@@ -1,12 +1,12 @@
 /*
- * File: visualizer.h
+ * File: knn.h
  *
  * Author: Denis Tananaev
  *
- * Date: 24.10.2016
+ * Date: 25.10.2016
  */
-#ifndef VISUALIZER_H
-#define VISUALIZER_H
+#ifndef KNN_H
+#define KNN_H
 
 #include <QMainWindow>
 #include <QMenu>
@@ -23,10 +23,10 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include "ui_visualizer.h"
+#include "ui_knn.h"
 
 
-class visualizer : public QMainWindow, private Ui_visualizer
+class knn : public QMainWindow, private Ui_knn
 {
     Q_OBJECT
 public slots:
@@ -34,20 +34,24 @@ public slots:
     void updateImage();
 
 public:
-    explicit visualizer(QWidget *parent = 0);
-    ~visualizer();
+    explicit knn(QWidget *parent = 0);
+    ~knn();
     void init();
-    bool readCFAR(const char* dirname);
+    bool trainSetread(const char* dirname);
+    bool testSetread(const char* dirname);
+    int  knnDistance(int test_picture_index); 
 
 private slots:
     void open();
 
 private:
-
-    std::vector<int> labels;
-    std::vector< std::vector<int> > images; 
+    int k_=1;
+    std::vector<int> train_labels;
+    std::vector< std::vector<int> > train_images; 
+    std::vector<int> test_labels;
+    std::vector< std::vector<int> > test_images; 
     std::vector<std::string> categories;
 
 };
 
-#endif // VISUALIZER_H
+#endif // KNN_H

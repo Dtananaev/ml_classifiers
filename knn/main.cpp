@@ -1,14 +1,14 @@
-#include "visualizer.h"
+#include "knn.h"
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    visualizer w;
-    if(w.readCFAR("../CIFAR10")){
+    knn w;
+   if(w.trainSetread("../CIFAR10") && w.testSetread("../CIFAR10")){
         w.init();
     }
 
-    w.show();
+   w.show();
     
     return a.exec();
 }
