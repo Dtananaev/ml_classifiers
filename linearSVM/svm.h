@@ -38,7 +38,7 @@ public slots:
    
     void updateImage();
     void calculatePerformance();
-
+    void runTraining();
 public:
    
     explicit svm(QWidget *parent = 0);
@@ -46,16 +46,19 @@ public:
     void init();
     bool trainSetread(const char* dirname);
     bool testSetread(const char* dirname);
-void calculateScores();
-void SVMtraining();
-void updateWeights();
-void initRandomWeights();
-void SVMiterate(int iter);
+    void calculateScores(int from, int until);
+    void SVMtraining(int from, int until);
+    void updateWeights();
+    void initRandomWeights();
+    void SVMiterate(int iter);
+
+    int inference(int test_picture_index);
 private slots:
     void open();
 
 private:
-    int iteration_=10;
+    float Loss_=0;
+    int iteration_=5;
     int batch_size_;
     int currentIndex_;
     float lambda_; //regularization parameter
