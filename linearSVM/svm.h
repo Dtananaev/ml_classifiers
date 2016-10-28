@@ -37,28 +37,37 @@ class svm : public QMainWindow, private Ui_svm
 public slots:
    
     void updateImage();
-    void calculatePerformance();
+
     void runTraining();
+    void updateStep();
+    void updateLambda();
+    void updatIterationNumber();
+    void updatBatchNumber();
+    void resetWeights();
 public:
-   
+
     explicit svm(QWidget *parent = 0);
     ~svm();
     void init();
+    void calculatePerformance();
     bool trainSetread(const char* dirname);
     bool testSetread(const char* dirname);
-    void calculateScores(int from, int until);
+    void calculateScores(int from, int until,int batch);
     void SVMtraining(int from, int until);
     void updateWeights();
     void initRandomWeights();
-    void SVMiterate(int iter);
+    void SVMiterate(int iter, int batch);
 
     int inference(int test_picture_index);
+    void weight2image(CMatrix<float> w,int label, QImage &img);
+    void vizWeights();
+
 private slots:
     void open();
 
 private:
     float Loss_=0;
-    int iteration_=5;
+    int iteration_;
     int batch_size_;
     int currentIndex_;
     float lambda_; //regularization parameter

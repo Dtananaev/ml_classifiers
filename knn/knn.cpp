@@ -77,7 +77,7 @@ void knn::init(){
 }
 
 void knn::updateK(){
-
+    k_=kBox->value();
 //knn recognition
     int knn_label= knnDistance(currentIndex_);
     lineEdit_2->setText(QString::fromUtf8(categories[knn_label].c_str()));

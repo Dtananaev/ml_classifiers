@@ -32,20 +32,143 @@ svm::svm(QWidget *parent):  QMainWindow(parent){
   connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
 
   connect(trainButton, SIGNAL(clicked()), this, SLOT(runTraining()));
-  connect(evalButton, SIGNAL(clicked()), this, SLOT(calculatePerformance()));
+  connect(resetWeightsButton, SIGNAL(clicked()), this, SLOT(resetWeights()));
+
+
+ connect(stepBox, SIGNAL(valueChanged(double)), this, SLOT(updateStep()));
+ connect(lambdaBox, SIGNAL(valueChanged(double)), this, SLOT(updateLambda()));
+ connect(itBox, SIGNAL(valueChanged(int)), this, SLOT(updatIterationNumber()));
+ connect(batchBox, SIGNAL(valueChanged(int)), this, SLOT(updatBatchNumber()));
+
+       batchBox->setValue(100);
+       stepBox->setRange(0.00000000000001, 1);
+       stepBox->setValue(0.00000000000001);
+       stepBox->setSingleStep(0.00000000000001);
+       lambdaBox->setValue(0.5);
 }
 
 svm::~svm(){
 }
+
+
+
+void svm::weight2image(CMatrix<float> w, int label, QImage &img){
+
+
+ for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+        int red=w(label,y*32+x);
+        int green=w(label,1024+y*32+x);
+        int blue=w(label,2048+y*32+x);
+      img.setPixel(x, y, qRgb(red, green, blue));
+    }
+  }
+
+}
+
+
+void svm::vizWeights(){
+
+   //create 10 image for weights
+ QImage img0(32, 32, QImage::Format_RGB888);
+ QImage img1(32, 32, QImage::Format_RGB888);
+ QImage img2(32, 32, QImage::Format_RGB888);
+ QImage img3(32, 32, QImage::Format_RGB888);
+ QImage img4(32, 32, QImage::Format_RGB888);
+ QImage img5(32, 32, QImage::Format_RGB888);
+ QImage img6(32, 32, QImage::Format_RGB888);
+ QImage img7(32, 32, QImage::Format_RGB888);
+ QImage img8(32, 32, QImage::Format_RGB888);
+ QImage img9(32, 32, QImage::Format_RGB888);
+
+CMatrix<float> w=W_;
+    w.normalize(0,255);
+   weight2image(w,0, img0);
+   weight2image(w,1, img1); 
+   weight2image(w,2, img2); 
+   weight2image(w,3, img3);
+   weight2image(w,4, img4);
+   weight2image(w,5, img5);
+   weight2image(w,6, img6);
+   weight2image(w,7, img7);
+   weight2image(w,8, img8);
+   weight2image(w,9, img9);
+
+   img0=img0.scaledToWidth(airplaneLbl1->width(), Qt::SmoothTransformation);
+   airplaneLbl1->setPixmap(QPixmap::fromImage(img0));
+   airplaneLbl1->show();
+
+
+   img1=img1.scaledToWidth(automobilLbl2->width(), Qt::SmoothTransformation);
+   automobilLbl2->setPixmap(QPixmap::fromImage(img1));
+   automobilLbl2->show();
+
+   img2=img2.scaledToWidth(birdLbl3->width(), Qt::SmoothTransformation);
+   birdLbl3->setPixmap(QPixmap::fromImage(img2));
+   birdLbl3->show();
+
+   img2=img2.scaledToWidth(birdLbl3->width(), Qt::SmoothTransformation);
+   birdLbl3->setPixmap(QPixmap::fromImage(img2));
+   birdLbl3->show();
+
+   img3=img3.scaledToWidth(catLbl4->width(), Qt::SmoothTransformation);
+   catLbl4->setPixmap(QPixmap::fromImage(img3));
+   catLbl4->show();
+
+   img4=img4.scaledToWidth(deerLbl5->width(), Qt::SmoothTransformation);
+   deerLbl5->setPixmap(QPixmap::fromImage(img4));
+   deerLbl5->show();
+
+   img5=img5.scaledToWidth(dogLbl6->width(), Qt::SmoothTransformation);
+   dogLbl6->setPixmap(QPixmap::fromImage(img5));
+   dogLbl6->show();
+
+   img6=img6.scaledToWidth(frogLbl7->width(), Qt::SmoothTransformation);
+   frogLbl7->setPixmap(QPixmap::fromImage(img6));
+   frogLbl7->show();
+
+
+   img7=img7.scaledToWidth(horseLbl8->width(), Qt::SmoothTransformation);
+   horseLbl8->setPixmap(QPixmap::fromImage(img7));
+   horseLbl8->show();
+
+   img8=img8.scaledToWidth(shipLbl9->width(), Qt::SmoothTransformation);
+   shipLbl9->setPixmap(QPixmap::fromImage(img8));
+   shipLbl9->show();
+
+
+   img9=img9.scaledToWidth(truckLbl10->width(), Qt::SmoothTransformation);
+   truckLbl10->setPixmap(QPixmap::fromImage(img9));
+   truckLbl10->show();
+
+
+}
+
+void svm::updatIterationNumber(){
+    iteration_=itBox->value();
+}
+
+void svm::updatBatchNumber(){
+    batch_size_=batchBox->value();
+}
+
+void svm::updateStep(){
+    step_=stepBox->value();
+}
+void svm::updateLambda(){
+
+    lambda_=lambdaBox->value();
+}
 void svm::runTraining(){
-    SVMiterate(iteration_);
+    
+    SVMiterate(iteration_, batch_size_);
 }
 //calculate scores by using linear score function y=W*x for training
-void svm::calculateScores(int from, int until){
+void svm::calculateScores(int from, int until, int batch){
 //for each image we should have vector of the size 10 (score for each class)
 //for all train set of the size N we will have matrix Nx10 of scores (in our case 50 000x10)
   //init score matrix
-    score_.setSize(batch_size_,categories.size());  // Nx10
+    score_.setSize(batch,categories.size());  // Nx10
     score_.fill(0.0);
     //std::cout<<"u-f "<<until-from<<"\n";
 
@@ -71,42 +194,49 @@ void svm::calculateScores(int from, int until){
 
 
 }
-void svm::SVMiterate(int iter){
+void svm::SVMiterate(int iter, int batch){
 
-  int number_of_full_batches= train_images.size()/batch_size_;
+      progressBar->setValue(0);
+  int number_of_full_batches= train_images.size()/batch;
 
-   std::cout<<"batch size "<<batch_size_<<"\n";
-   std::cout<<"number of full batches "<<number_of_full_batches<<"\n";
 
-   int last_batch= train_images.size()-number_of_full_batches*batch_size_;
+
+   int last_batch= train_images.size()-number_of_full_batches*batch;
 
     for(int i=0; i<iter;i++){
-//std::cout<<"aaaa "<<number_of_full_batches<<"\n";
-        for(int j=0;j<number_of_full_batches;j++){
-           //int from=0; int until=0;
-           
+         itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
+         progressBar->setValue(0);  
+        for(int j=0;j<number_of_full_batches;j++){    
+                    
 
-             int from=j*batch_size_;
-             int until=j*batch_size_+batch_size_-1;
+               int progress = 100*j/number_of_full_batches;
+                progressBar->setValue(progress);       
 
-          //  }else if (last_batch>0){
-
-         //        from= number_of_full_batches*batch_size_;
-         //        until=from+last_batch-1;
-
-          //  }      
-            calculateScores( from,  until);
+             int from=j*batch;
+             int until=j*batch+batch-1;    
+            calculateScores( from,  until, batch);
             SVMtraining( from,  until);
             updateWeights();
-//std::cout<<"number of full batches "<<number_of_full_batches<<"\n";
+            lossResult->setText(QString::number(Loss_));
+    vizWeights();
         } 
-    std::cout<<"Loss "<< Loss_<<"\n";
+    
+
+    calculatePerformance();
     }
 
+       progressBar->setValue(100);
 }
 
 
+void svm::resetWeights(){
+//init weight and scores matrices
+   initRandomWeights();
+    vizWeights();
+    int result = inference(currentIndex_);
+    lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 
+}
 void svm::updateWeights(){
  for(int x=0; x<dW_.xSize();x++){
      for(int y=0; y<dW_.ySize();y++){
@@ -121,6 +251,8 @@ void svm::SVMtraining(int from, int until){
     loss_.clear(); //compute loss for each image
 
     for(int i=from; i<until; i++){
+          QCoreApplication::processEvents();
+
           int a=i-from;
           float y=score_(a,train_labels[i]);//right score
           std::vector<float> score(10,0);
@@ -204,11 +336,13 @@ void svm::init(){
   categories.push_back("truck");
 
 //SVM init!!!
+    iteration_=1;
     batch_size_=100;
     lambda_=0.5;
     step_=0.00000000001;
  //init weight and scores matrices
    initRandomWeights();
+    vizWeights();
 //W_.setSize(categories.size(),train_images[0].size()); //weight matrix
 //W_.fill(0.00001); //weight matrix
     dW_.setSize(categories.size(),train_images[0].size()); //gradient update matrix
@@ -236,7 +370,7 @@ void svm::init(){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-    int result = inference(index);
+    int result = inference(currentIndex_);
   
     lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
@@ -296,21 +430,15 @@ void svm::calculatePerformance(){
 
      float acc=0;
  for(int i=0; i<test_labels.size();i++){
- //for(int i=0; i<100;i++){
-    int progress = i/test_labels.size();
-    progressBar->setValue(progress);
+
+
           int prediction=inference(i);
 
         acc+= prediction == test_labels[i];
-//std::cout<<"acc "<<acc<<"\n";
     }
     progressBar->setValue(0);
-    //acc=acc/test_labels.size();
-
     acc=acc/test_labels.size();
 std::cout<<"final acc "<<acc<<"\n";
- //   lineEdit_3->setText(acc);
-
 accResult->setText(QString::number(acc));
 
 

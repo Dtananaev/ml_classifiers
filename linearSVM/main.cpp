@@ -8,7 +8,11 @@ int main(int argc, char *argv[])
         w.init();
     }
 
+
    w.show();
-    
-    return a.exec();
+
+    while ( w.isVisible()) {
+        a.processEvents();
+}    
+    return 0;
 }
