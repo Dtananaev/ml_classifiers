@@ -44,6 +44,9 @@ public slots:
     void updatIterationNumber();
     void updatBatchNumber();
     void resetWeights();
+    void zeroMeanData();
+    void fullNormalization();
+    void stopClicked();
 public:
 
     explicit svm(QWidget *parent = 0);
@@ -62,10 +65,13 @@ public:
     void weight2image(CMatrix<float> w,int label, QImage &img);
     void vizWeights();
 
+
 private slots:
     void open();
 
 private:
+    bool stop_;
+    void CalcMeanSigma(const std::vector<double> v, double &mean, double &sigma);
     float Loss_=0;
     int iteration_;
     int batch_size_;

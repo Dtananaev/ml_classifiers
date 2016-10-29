@@ -11,7 +11,7 @@
 #include <omp.h>
 
 svm::svm(QWidget *parent):  QMainWindow(parent){   
-
+    stop_=true;
     // this sets up GUI
     setupUi(this);
 
@@ -31,8 +31,11 @@ svm::svm(QWidget *parent):  QMainWindow(parent){
   connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
   connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
 
+  connect(stopButton, SIGNAL(clicked()), this, SLOT(stopClicked()));
   connect(trainButton, SIGNAL(clicked()), this, SLOT(runTraining()));
   connect(resetWeightsButton, SIGNAL(clicked()), this, SLOT(resetWeights()));
+  connect(zeroMeanButton, SIGNAL(clicked()), this, SLOT(zeroMeanData()));
+  connect(normalizationButton, SIGNAL(clicked()), this, SLOT(fullNormalization()));
 
 
  connect(stepBox, SIGNAL(valueChanged(double)), this, SLOT(updateStep()));
@@ -51,6 +54,10 @@ svm::~svm(){
 }
 
 
+void svm::stopClicked(){
+
+ stop_=true;
+}
 
 void svm::weight2image(CMatrix<float> w, int label, QImage &img){
 
@@ -160,8 +167,209 @@ void svm::updateLambda(){
     lambda_=lambdaBox->value();
 }
 void svm::runTraining(){
-    
+    stop_=false;
     SVMiterate(iteration_, batch_size_);
+}
+
+void svm::zeroMeanData(){
+meanLabel->setText(QString::fromUtf8("Wait..."));
+//compute the mean image
+
+CMatrix<float> red(32,32,0);
+CMatrix<float> green(32,32,0);
+CMatrix<float> blue(32,32,0);
+
+for(int i=0; i<train_images.size();i++){
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         red(x,y)+=train_images[i][y*32+x];
+         green(x,y)+=train_images[i][1024+y*32+x];
+         blue(x,y)+=train_images[i][2048+y*32+x];
+    }
+  }
+    
+}
+
+   for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         red(x,y)=red(x,y)/50000;
+         green(x,y)=green(x,y)/50000;
+         blue(x,y)=blue(x,y)/50000;
+    }
+  }
+
+
+for(int i=0; i<train_images.size();i++){
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         train_images[i][y*32+x]=(train_images[i][y*32+x]-red(x,y));
+        train_images[i][1024+y*32+x]=(train_images[i][1024+y*32+x]-green(x,y));
+        train_images[i][2048+y*32+x]=(train_images[i][2048+y*32+x]-blue(x,y));
+    }
+  }
+
+
+}
+meanLabel->setText(QString::fromUtf8("Zero Mean dataset."));
+    std::cout<<"Make dataset zero mean"<<"\n"; 
+   zeroMeanButton->setEnabled(false); 
+}
+void svm::CalcMeanSigma(const std::vector<double> data, double &mean, double &sigma){
+   mean = 0;
+    sigma=0;
+    for(int i=0; i<data.size();i++){
+            mean+=data[i];
+}
+    mean= mean/ data.size();
+    //std::cout<<"data size "<<data.size()<<"\n";
+    //sigma
+
+       for(int i=0; i<data.size();i++){
+        sigma += ( data[i]- mean)  * ( data[i] - mean);
+       // std::cout<<"( *it - mean) "<<( *it - mean)<<"\n";
+        //std::cout<<"sigma "<<sigma<<"\n";
+       // std::cin.get();
+    }
+  //std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
+    sigma=sqrt(sigma/(data.size()-1));  
+       
+// std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
+      //  std::cin.get();
+}
+
+void svm::fullNormalization(){
+meanLabel->setText(QString::fromUtf8("Wait..."));
+//zero mean and dispersion from -1 to 1
+//compute the mean image
+
+//for each image and each channel calculate the mean value
+std::vector<double> red;
+std::vector<double> green;
+std::vector<double> blue;
+/*
+for(int i=0; i<test_images.size();i++){
+    red.clear();
+    green.clear();
+    blue.clear();
+
+
+    for (int y = 0; y < 32; ++y) {
+for (int x = 0; x < 32; ++x) {
+         red.push_back(test_images[i][y*32+x]);
+         green.push_back(test_images[i][1024+y*32+x]);
+         blue.push_back(test_images[i][2048+y*32+x]);
+    }
+  }
+
+    //finding the meat and covariance
+    //for red  
+    double meanRed; 
+    double sigmaRed;
+    CalcMeanSigma(red, meanRed, sigmaRed);
+      double meanGreen;
+    double sigmaGreen;
+    CalcMeanSigma(green, meanGreen, sigmaGreen);
+      double meanBlue; 
+double sigmaBlue;
+    CalcMeanSigma(blue, meanBlue, sigmaBlue);
+
+// Normalization (make z tranform ) 
+//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
+
+
+for (int i=0;i<red.size(); i++ )
+{
+
+    red[i]=(red[i]-meanRed)/sigmaRed;
+
+}
+
+
+for (int i=0;i<green.size(); i++ )
+{
+    green[i]=(green[i]-meanGreen)/sigmaGreen;
+}
+
+
+for (int i=0;i<blue.size(); i++ )
+{
+    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
+}
+
+std::vector<double> result=red;
+result.insert(result.end(), green.begin(), green.end()); 
+result.insert(result.end(), blue.begin(), blue.end()); 
+ 
+  //  result.push_back(1);    
+//test_images[i]=result;
+std::copy( result.begin(), result.end(), test_images[i].begin() );
+}
+*/
+for(int i=0; i<train_images.size();i++){
+    red.clear();
+    green.clear();
+    blue.clear();
+
+
+    for (int y = 0; y < 32; ++y) {
+for (int x = 0; x < 32; ++x) {
+         red.push_back(train_images[i][y*32+x]);
+         green.push_back(train_images[i][1024+y*32+x]);
+         blue.push_back(train_images[i][2048+y*32+x]);
+    }
+  }
+
+    //finding the meat and covariance
+    //for red  
+    double meanRed; 
+    double sigmaRed;
+    CalcMeanSigma(red, meanRed, sigmaRed);
+      double meanGreen;
+    double sigmaGreen;
+    CalcMeanSigma(green, meanGreen, sigmaGreen);
+      double meanBlue; 
+double sigmaBlue;
+    CalcMeanSigma(blue, meanBlue, sigmaBlue);
+
+// Normalization (make z tranform ) 
+//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
+
+
+for (int i=0;i<red.size(); i++ )
+{
+
+    red[i]=(red[i]-meanRed)/sigmaRed;
+
+}
+
+
+for (int i=0;i<green.size(); i++ )
+{
+    green[i]=(green[i]-meanGreen)/sigmaGreen;
+}
+
+
+for (int i=0;i<blue.size(); i++ )
+{
+    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
+}
+
+std::vector<double> result=red;
+result.insert(result.end(), green.begin(), green.end()); 
+result.insert(result.end(), blue.begin(), blue.end()); 
+ 
+  //  result.push_back(1);    
+//train_images[i]=result;
+std::copy( result.begin(), result.end(), train_images[i].begin() );
+}
+
+  
+
+
+meanLabel->setText(QString::fromUtf8("Normalized dataset."));
+    std::cout<<"Make dataset normalized"<<"\n"; 
+   zeroMeanButton->setEnabled(false); 
+   normalizationButton->setEnabled(false); 
 }
 //calculate scores by using linear score function y=W*x for training
 void svm::calculateScores(int from, int until, int batch){
@@ -207,8 +415,8 @@ void svm::SVMiterate(int iter, int batch){
          itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
          progressBar->setValue(0);  
         for(int j=0;j<number_of_full_batches;j++){    
-                    
-
+                               if(stop_){return;}
+                
                int progress = 100*j/number_of_full_batches;
                 progressBar->setValue(progress);       
 
@@ -240,7 +448,9 @@ void svm::resetWeights(){
 void svm::updateWeights(){
  for(int x=0; x<dW_.xSize();x++){
      for(int y=0; y<dW_.ySize();y++){
+                   if(stop_){return;}
         W_(x,y)-= step_*dW_(x,y);
+       //  std::cout<<"dW["<<x<<"]["<<y<<"]="<<dW_(x,y)<<"  W["<<x<<"]["<<y<<"]="<<W_(x,y)<<"\n";
         }
     }
 }
@@ -252,7 +462,7 @@ void svm::SVMtraining(int from, int until){
 
     for(int i=from; i<until; i++){
           QCoreApplication::processEvents();
-
+           if(stop_){return;}
           int a=i-from;
           float y=score_(a,train_labels[i]);//right score
           std::vector<float> score(10,0);
@@ -334,6 +544,7 @@ void svm::init(){
   categories.push_back("horse");
   categories.push_back("ship");
   categories.push_back("truck");
+
 
 //SVM init!!!
     iteration_=1;
@@ -445,8 +656,8 @@ accResult->setText(QString::number(acc));
 }
 
 bool svm::trainSetread(const char* dirname){
-
-
+train_images.clear();
+train_labels.clear();
     QDir dir(dirname);
 
     if(!dir.exists()) {
@@ -506,8 +717,8 @@ bool svm::trainSetread(const char* dirname){
 
 
 bool svm::testSetread(const char* dirname){
-
-
+test_labels.clear();
+test_images.clear();
     QDir dir(dirname);
 
     if(!dir.exists()) {
