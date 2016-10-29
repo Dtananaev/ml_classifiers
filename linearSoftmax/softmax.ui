@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>svm</class>
- <widget class="QMainWindow" name="svm">
+ <class>softmax</class>
+ <widget class="QMainWindow" name="softmax">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -337,7 +337,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>svm- properties</string>
+     <string>softmax</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_7">
