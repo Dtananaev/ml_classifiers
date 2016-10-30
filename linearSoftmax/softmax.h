@@ -45,7 +45,8 @@ public slots:
     void updatBatchNumber();
     void resetWeights();
     void zeroMeanData();
-    void fullNormalization();
+    void standartisation();
+    void normalization();
     void stopClicked();
 public:
 
@@ -70,6 +71,7 @@ private slots:
     void open();
 
 private:
+    std::vector<int> index_;
     std::vector<float> normalizer_;
     bool stop_;
     void CalcMeanSigma(const std::vector<double> v, double &mean, double &sigma);
@@ -86,9 +88,9 @@ private:
       std::vector<float> loss_; //vector of loss for each data sample
  
     std::vector<int> train_labels;
-    std::vector< std::vector<int> > train_images; 
+    std::vector< std::vector<float> > train_images; 
     std::vector<int> test_labels;
-    std::vector< std::vector<int> > test_images; 
+    std::vector< std::vector<float> > test_images; 
     std::vector<std::string> categories;
 
 };

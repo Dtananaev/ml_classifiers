@@ -9,7 +9,7 @@
 #include "softmax.h"
 #include <random>
 #include <omp.h>
-
+#include <algorithm>    // std::random_shuffle
 softmax::softmax(QWidget *parent):  QMainWindow(parent){   
     stop_=true;
     // this sets up GUI
@@ -35,8 +35,8 @@ softmax::softmax(QWidget *parent):  QMainWindow(parent){
   connect(trainButton, SIGNAL(clicked()), this, SLOT(runTraining()));
   connect(resetWeightsButton, SIGNAL(clicked()), this, SLOT(resetWeights()));
   connect(zeroMeanButton, SIGNAL(clicked()), this, SLOT(zeroMeanData()));
-  connect(normalizationButton, SIGNAL(clicked()), this, SLOT(fullNormalization()));
-
+  connect(standardizationButton, SIGNAL(clicked()), this, SLOT(standartisation()));
+  connect(normalizationButton, SIGNAL(clicked()), this, SLOT(normalization()));
 
  connect(stepBox, SIGNAL(valueChanged(double)), this, SLOT(updateStep()));
  connect(lambdaBox, SIGNAL(valueChanged(double)), this, SLOT(updateLambda()));
@@ -168,6 +168,8 @@ void softmax::updateLambda(){
 }
 void softmax::runTraining(){
     stop_=false;
+
+
     iterate(iteration_, batch_size_);
 }
 
@@ -210,6 +212,18 @@ for (int x = 0; x < 32; ++x) {
 
 
 }
+
+for(int i=0; i<test_images.size();i++){
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         test_images[i][y*32+x]=(test_images[i][y*32+x]-red(x,y));
+        test_images[i][1024+y*32+x]=(test_images[i][1024+y*32+x]-green(x,y));
+        test_images[i][2048+y*32+x]=(test_images[i][2048+y*32+x]-blue(x,y));
+    }
+  }
+
+
+}
 meanLabel->setText(QString::fromUtf8("Zero Mean dataset."));
     std::cout<<"Make dataset zero mean"<<"\n"; 
    zeroMeanButton->setEnabled(false); 
@@ -237,140 +251,202 @@ void softmax::CalcMeanSigma(const std::vector<double> data, double &mean, double
       //  std::cin.get();
 }
 
-void softmax::fullNormalization(){
+void softmax::standartisation(){
 meanLabel->setText(QString::fromUtf8("Wait..."));
-//zero mean and dispersion from -1 to 1
+//zero mean and sigma from  1
 //compute the mean image
+CMatrix<float> red(32,32,0);
+CMatrix<float> green(32,32,0);
+CMatrix<float> blue(32,32,0);
 
-//for each image and each channel calculate the mean value
-std::vector<double> red;
-std::vector<double> green;
-std::vector<double> blue;
-/*
-for(int i=0; i<test_images.size();i++){
-    red.clear();
-    green.clear();
-    blue.clear();
-
-
-    for (int y = 0; y < 32; ++y) {
-for (int x = 0; x < 32; ++x) {
-         red.push_back(test_images[i][y*32+x]);
-         green.push_back(test_images[i][1024+y*32+x]);
-         blue.push_back(test_images[i][2048+y*32+x]);
-    }
-  }
-
-    //finding the meat and covariance
-    //for red  
-    double meanRed; 
-    double sigmaRed;
-    CalcMeanSigma(red, meanRed, sigmaRed);
-      double meanGreen;
-    double sigmaGreen;
-    CalcMeanSigma(green, meanGreen, sigmaGreen);
-      double meanBlue; 
-double sigmaBlue;
-    CalcMeanSigma(blue, meanBlue, sigmaBlue);
-
-// Normalization (make z tranform ) 
-//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
-
-
-for (int i=0;i<red.size(); i++ )
-{
-
-    red[i]=(red[i]-meanRed)/sigmaRed;
-
-}
-
-
-for (int i=0;i<green.size(); i++ )
-{
-    green[i]=(green[i]-meanGreen)/sigmaGreen;
-}
-
-
-for (int i=0;i<blue.size(); i++ )
-{
-    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
-}
-
-std::vector<double> result=red;
-result.insert(result.end(), green.begin(), green.end()); 
-result.insert(result.end(), blue.begin(), blue.end()); 
- 
-  //  result.push_back(1);    
-//test_images[i]=result;
-std::copy( result.begin(), result.end(), test_images[i].begin() );
-}
-*/
 for(int i=0; i<train_images.size();i++){
-    red.clear();
-    green.clear();
-    blue.clear();
-
-
-    for (int y = 0; y < 32; ++y) {
 for (int x = 0; x < 32; ++x) {
-         red.push_back(train_images[i][y*32+x]);
-         green.push_back(train_images[i][1024+y*32+x]);
-         blue.push_back(train_images[i][2048+y*32+x]);
+    for (int y = 0; y < 32; ++y) {
+         red(x,y)+=train_images[i][y*32+x];
+         green(x,y)+=train_images[i][1024+y*32+x];
+         blue(x,y)+=train_images[i][2048+y*32+x];
+    }
+  }
+    
+}
+
+   for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         red(x,y)=red(x,y)/50000;
+         green(x,y)=green(x,y)/50000;
+         blue(x,y)=blue(x,y)/50000;
     }
   }
 
-    //finding the meat and covariance
-    //for red  
-    double meanRed; 
-    double sigmaRed;
-    CalcMeanSigma(red, meanRed, sigmaRed);
-      double meanGreen;
-    double sigmaGreen;
-    CalcMeanSigma(green, meanGreen, sigmaGreen);
-      double meanBlue; 
-double sigmaBlue;
-    CalcMeanSigma(blue, meanBlue, sigmaBlue);
+//compute the sigma 
+CMatrix<double> redSigma(32,32,0);
+CMatrix<double> greenSigma(32,32,0);
+CMatrix<double> blueSigma(32,32,0);
 
-// Normalization (make z tranform ) 
-//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
+for(int i=0; i<train_images.size();i++){
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         redSigma(x,y)+=(train_images[i][y*32+x]- red(x,y))*(train_images[i][y*32+x]- red(x,y));
+         greenSigma(x,y)+=(train_images[i][1024+y*32+x]-green(x,y))*(train_images[i][1024+y*32+x]-green(x,y));
+         blueSigma(x,y)+=(train_images[i][2048+y*32+x]-blue(x,y))*(train_images[i][2048+y*32+x]-blue(x,y));
+    }
+  }
+    
+}
+
+   for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+         redSigma(x,y)=sqrt( redSigma(x,y)/49999);
+         greenSigma(x,y)=sqrt( greenSigma(x,y)/49999);
+         blueSigma(x,y)=sqrt( blueSigma(x,y)/49999);
+    }
+  }
 
 
-for (int i=0;i<red.size(); i++ )
-{
+//normalization
+for(int i=0; i<train_images.size();i++){
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
 
-    red[i]=(red[i]-meanRed)/sigmaRed;
+        //std::cout<<"before R "<<train_images[i][y*32+x]<<"\n";
+      //  std::cout<<"before G "<<train_images[i][1024+y*32+x]<<"\n";
+       // std::cout<<"before B "<< train_images[i][2048+y*32+x]<<"\n";
+
+         train_images[i][y*32+x]=(train_images[i][y*32+x]-red(x,y))/ redSigma(x,y);
+        train_images[i][1024+y*32+x]=(train_images[i][1024+y*32+x]-green(x,y))/ greenSigma(x,y);
+        train_images[i][2048+y*32+x]=(train_images[i][2048+y*32+x]-blue(x,y))/  blueSigma(x,y);
+      //  std::cout<<"sigmaR "<<redSigma(x,y)<<"\n";
+       // std::cout<<"sigmaG "<<greenSigma(x,y)<<"\n";
+       // std::cout<<"sigmaB "<<blueSigma(x,y)<<"\n";
+
+       // std::cout<<"R "<<train_images[i][y*32+x]<<"\n";
+       // std::cout<<"G "<<train_images[i][1024+y*32+x]<<"\n";
+       // std::cout<<"B "<< train_images[i][2048+y*32+x]<<"\n";
+      //  std::cin.get();
+    }
+  }
+
 
 }
 
+for(int i=0; i<test_images.size();i++){
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+        test_images[i][y*32+x]=(test_images[i][y*32+x]-red(x,y))/ redSigma(x,y);
+        test_images[i][1024+y*32+x]=(test_images[i][1024+y*32+x]-green(x,y))/greenSigma(x,y);
+        test_images[i][2048+y*32+x]=(test_images[i][2048+y*32+x]-blue(x,y))/  blueSigma(x,y);
+    }
+  }
 
-for (int i=0;i<green.size(); i++ )
-{
-    green[i]=(green[i]-meanGreen)/sigmaGreen;
+
 }
 
+meanLabel->setText(QString::fromUtf8("Standardized  dataset."));
+    std::cout<<"Make dataset Standardized"<<"\n"; 
+   zeroMeanButton->setEnabled(false); 
+   standardizationButton->setEnabled(false); 
 
-for (int i=0;i<blue.size(); i++ )
-{
-    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
 }
+//put the values zero mean and from at the intervall -1 to 1 y = (ymax-ymin)*(x-xmin)/(xmax-xmin) + ymin;
+void softmax::normalization(){
 
-std::vector<double> result=red;
-result.insert(result.end(), green.begin(), green.end()); 
-result.insert(result.end(), blue.begin(), blue.end()); 
- 
-  //  result.push_back(1);    
-//train_images[i]=result;
-std::copy( result.begin(), result.end(), train_images[i].begin() );
-}
 
+for(int i=0; i<train_images.size();i++){
+    float minR=0;
+    float minG=0;
+    float minB=0;
+    float maxR=0;
+    float maxG=0;
+    float maxB=0;
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+
+         if( train_images[i][y*32+x]>maxR ){ maxR=train_images[i][y*32+x]; }
+         if(train_images[i][y*32+x]<minR){minR=train_images[i][y*32+x];}
+
+         if(train_images[i][1024+y*32+x]>maxG){maxG=train_images[i][1024+y*32+x];}
+         if(train_images[i][1024+y*32+x]<minG){minG=train_images[i][1024+y*32+x];}
+
+         if(train_images[i][2048+y*32+x]>maxB){maxB=train_images[i][2048+y*32+x];}
+         if(train_images[i][2048+y*32+x]<minB){minB=train_images[i][2048+y*32+x];}
+    }
+  }
+    
+
+
+        for (int x = 0; x < 32; ++x) {
+            for (int y = 0; y < 32; ++y) {
+       // std::cout<<"before R "<<train_images[i][y*32+x]<<"\n";
+       // std::cout<<"before G "<<train_images[i][1024+y*32+x]<<"\n";     
+       // std::cout<<"before B "<<train_images[i][2048+y*32+x]<<"\n";  
+        train_images[i][y*32+x]=2*(train_images[i][y*32+x] -minR)/(maxR-minR)-1;
+        train_images[i][1024+y*32+x]=2*(train_images[i][1024+y*32+x] -minG)/(maxG-minG)-1;
+        train_images[i][2048+y*32+x]=2*(train_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;  
+
+       // std::cout<<"R "<<train_images[i][y*32+x]<<"\n";
+      //  std::cout<<"G "<<train_images[i][1024+y*32+x]<<"\n";     
+       // std::cout<<"B "<<train_images[i][2048+y*32+x]<<"\n"; 
+
+   // std::cin.get();  
   
+    }   
+
+  }
+}
+
+
+for(int i=0; i<test_images.size();i++){
+    float minR=0;
+    float minG=0;
+    float minB=0;
+    float maxR=0;
+    float maxG=0;
+    float maxB=0;
+for (int x = 0; x < 32; ++x) {
+    for (int y = 0; y < 32; ++y) {
+
+         if(test_images[i][y*32+x]>maxR){maxR=test_images[i][y*32+x];}
+         if(test_images[i][y*32+x]<minR){minR=test_images[i][y*32+x];}
+
+         if(test_images[i][1024+y*32+x]>maxG){maxG=test_images[i][1024+y*32+x];}
+         if(test_images[i][1024+y*32+x]<minG){minG=test_images[i][1024+y*32+x];}
+
+         if(test_images[i][2048+y*32+x]>maxB){maxB=test_images[i][2048+y*32+x];}
+         if(test_images[i][2048+y*32+x]<minB){minB=test_images[i][2048+y*32+x];}
+    }
+  }
+    
+
+
+        for (int x = 0; x < 32; ++x) {
+            for (int y = 0; y < 32; ++y) {
+        //std::cout<<"before R "<<test_images[i][y*32+x]<<"\n";
+       // std::cout<<"before G "<<test_images[i][1024+y*32+x]<<"\n";     
+        //std::cout<<"before B "<<test_images[i][2048+y*32+x]<<"\n";  
+        test_images[i][y*32+x]=2*(test_images[i][y*32+x] -minR)/(maxR-minR)-1;
+        test_images[i][1024+y*32+x]=2*(test_images[i][1024+y*32+x] -minG)/(maxG-minG)-1;
+        test_images[i][2048+y*32+x]=2*(test_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;  
+
+       /// std::cout<<"R "<<test_images[i][y*32+x]<<"\n";
+       // std::cout<<"G "<<test_images[i][1024+y*32+x]<<"\n";     
+       // std::cout<<"B "<<test_images[i][2048+y*32+x]<<"\n";   
+  
+    }   
+
+  }
+}
+ 
+
 
 
 meanLabel->setText(QString::fromUtf8("Normalized dataset."));
     std::cout<<"Make dataset normalized"<<"\n"; 
-   zeroMeanButton->setEnabled(false); 
+  // zeroMeanButton->setEnabled(false); 
    normalizationButton->setEnabled(false); 
 }
+
+
+
 //calculate scores by using linear score function y=W*x for training
 void softmax::calculateScores(int from, int until, int batch){
 //for each image we should have vector of the size 10 (score for each class)
@@ -384,13 +460,13 @@ void softmax::calculateScores(int from, int until, int batch){
     for(int i=from; i<until; i++){
            int max_score=0;
                       int a=i-from; 
-        for(int p=0;p<train_images[i].size();p++){
+        for(int p=0;p<train_images[index_[i]].size();p++){
             //cost(50000,10)  W(10, 3073)*image(3073,1)     
    
  
 
             for (int label=0; label<10;label++){            
-             score_(a,label)+= W_(label,p)*train_images[i][p];
+             score_(a,label)+= W_(label,p)*train_images[index_[i]][p];
                 if(score_(a,label)>max_score){
                     max_score=score_(a,label);
                 }
@@ -412,12 +488,12 @@ void softmax::iterate(int iter, int batch){
 
       progressBar->setValue(0);
   int number_of_full_batches= train_images.size()/batch;
-
-
-
    int last_batch= train_images.size()-number_of_full_batches*batch;
 
     for(int i=0; i<iter;i++){
+
+     std::random_shuffle ( index_.begin(), index_.end() );//random batch sampling
+
          itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
          progressBar->setValue(0);  
         for(int j=0;j<number_of_full_batches;j++){    
@@ -452,13 +528,28 @@ void softmax::resetWeights(){
 
 }
 void softmax::updateWeights(){
+float weight;
+float dw;   
+float scale1=0;
+float scale2=0;
  for(int x=0; x<dW_.xSize();x++){
+      // weight=0;
+      // dw=0;
+
      for(int y=0; y<dW_.ySize();y++){
                    if(stop_){return;}
+        //calculate the scale of weights and weight update
+        weight+=W_(x,y)*W_(x,y);
+         dw+= step_*dW_(x,y)*step_*dW_(x,y); 
         W_(x,y)-= step_*dW_(x,y);
        //  std::cout<<"dW["<<x<<"]["<<y<<"]="<<dW_(x,y)<<"  W["<<x<<"]["<<y<<"]="<<W_(x,y)<<"\n";
         }
+       // scale1
+    
     }
+
+    float a=sqrt(dw)/sqrt(weight);
+            weightRelation->setText(QString::number(a));
 }
 
 //SoftmaxTraining  function
@@ -471,7 +562,7 @@ void softmax::SoftmaxTraining(int from, int until){
           QCoreApplication::processEvents();
            if(stop_){return;}
           int a=i-from;
-          double y=score_(a,train_labels[i]);//right  exp(score)
+          double y=score_(a,train_labels[index_[i]]);//right  exp(score)
          
            //compute  softmax loss
             double softmax=y/normalizer_[a];
@@ -480,12 +571,12 @@ void softmax::SoftmaxTraining(int from, int until){
             for(int dx=0; dx<dW_.xSize();dx++){
                 for(int dy=0; dy<dW_.ySize();dy++){
                                
-                 if(train_labels[i]==dx){ //if this is correct label row of weights
+                 if(train_labels[index_[i]]==dx){ //if this is correct label row of weights
                           
-                dW_(dx,dy)+=train_images[i][dy]*(softmax-1)+lambda_*W_(dx,dy);
+                dW_(dx,dy)+=train_images[index_[i]][dy]*(softmax-1)+lambda_*W_(dx,dy);
                          
-                }else if(train_labels[i]!=dx){    
-                    dW_(dx,dy)+= train_images[i][dy]*score_(a,dx) +lambda_*W_(dx,dy);                  
+                }else if(train_labels[index_[i]]!=dx){    
+                    dW_(dx,dy)+= train_images[index_[i]][dy]*score_(a,dx) +lambda_*W_(dx,dy);                  
                 }                  
             }
         }
@@ -532,6 +623,10 @@ void softmax::initRandomWeights(){
 }
 
 void softmax::init(){
+//add indices from 0 to 49 999 to the index_ vector for random batch sampling
+for(int i=0;i<50000;i++){
+    index_.push_back(i);
+}
 
   //fill the cathegory names
   categories.push_back("airplane");
@@ -649,7 +744,7 @@ void softmax::calculatePerformance(){
     }
     progressBar->setValue(0);
     acc=acc/test_labels.size();
-std::cout<<"final acc "<<acc<<"\n";
+std::cout<<"Acc: "<<acc<<"\n";
 accResult->setText(QString::number(acc));
 
 
@@ -696,7 +791,7 @@ train_labels.clear();
             //push to the vector of labels
             train_labels.push_back((int)tplabel);
 
-            std::vector<int> picture;
+            std::vector<float> picture;
             for(int channel = 0; channel < 3; ++channel){
                 for(int x = 0; x < n_rows; ++x){
                     for(int y = 0; y < n_cols; ++y){
@@ -753,7 +848,7 @@ test_images.clear();
             //push to the vector of labels
            test_labels.push_back((int)tplabel);
 
-            std::vector<int> picture;
+            std::vector<float> picture;
             for(int channel = 0; channel < 3; ++channel){
                 for(int x = 0; x < n_rows; ++x){
                     for(int y = 0; y < n_cols; ++y){
