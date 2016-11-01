@@ -1,20 +1,19 @@
 /*
- * File: softmax.cpp
+ * File: ffnn.cpp
  *
  * Author: Denis Tananaev
  *
- * Date: 29.10.2016
+ * Date: 30.10.2016
  */
 
-#include "softmax.h"
+#include "ffnn.h"
 #include <random>
 #include <omp.h>
 #include <algorithm>    // std::random_shuffle
-softmax::softmax(QWidget *parent):  QMainWindow(parent){   
+ffnn::ffnn(QWidget *parent):  QMainWindow(parent){   
     stop_=true;
     // this sets up GUI
     setupUi(this);
-
     // File menu   
    menuBar()->setNativeMenuBar(false);// this line  is necessary for visualization otherwise menu invisible
   QAction *open = new QAction( "&Open", this);
@@ -44,24 +43,24 @@ softmax::softmax(QWidget *parent):  QMainWindow(parent){
  connect(batchBox, SIGNAL(valueChanged(int)), this, SLOT(updatBatchNumber()));
 
        batchBox->setValue(100);
-       stepBox->setRange(0.00000000000001, 1);
+       stepBox->setRange(0.00000000000001, 99);
        stepBox->setValue(0.00000000000001);
        stepBox->setSingleStep(0.00000000000001);
        lambdaBox->setValue(0.5);
 }
 
-softmax::~softmax(){
+
+ffnn::~ffnn(){
 }
 
 
-void softmax::stopClicked(){
 
+void ffnn::stopClicked(){
  stop_=true;
 }
 
-void softmax::weight2image(CMatrix<float> w, int label, QImage &img){
 
-
+void ffnn::weight2image(CMatrix<float> w, int label, QImage &img){
  for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
         int red=w(label,y*32+x);
@@ -74,7 +73,7 @@ void softmax::weight2image(CMatrix<float> w, int label, QImage &img){
 }
 
 
-void softmax::vizWeights(){
+void ffnn::vizWeights(){
 
    //create 10 image for weights
  QImage img0(32, 32, QImage::Format_RGB888);
@@ -88,7 +87,7 @@ void softmax::vizWeights(){
  QImage img8(32, 32, QImage::Format_RGB888);
  QImage img9(32, 32, QImage::Format_RGB888);
 
-CMatrix<float> w=W_;
+CMatrix<float> w=W1_;
     w.normalize(0,255);
    weight2image(w,0, img0);
    weight2image(w,1, img1); 
@@ -151,29 +150,39 @@ CMatrix<float> w=W_;
 
 }
 
-void softmax::updatIterationNumber(){
+void ffnn::updatIterationNumber(){
     iteration_=itBox->value();
 }
 
-void softmax::updatBatchNumber(){
+void ffnn::updatBatchNumber(){
     batch_size_=batchBox->value();
 }
 
-void softmax::updateStep(){
+void ffnn::updateStep(){
     step_=stepBox->value();
 }
-void softmax::updateLambda(){
+void ffnn::updateLambda(){
 
     lambda_=lambdaBox->value();
 }
-void softmax::runTraining(){
+
+void ffnn::runTraining(){
     stop_=false;
-
-
-    iterate(iteration_, batch_size_);
+    int from = 0; 
+    int until =1000;
+    for(int i=0;i<iteration_;i++){
+ QCoreApplication::processEvents();
+           if(stop_){return;}
+    CMatrix<float> score1=calculateScoresLayer1( from,  until );
+    CMatrix<float> relu= ReLU(score1);
+    CMatrix<float> score2=calculateScoresLayer2(relu);
+    softmaxLoss(score2,relu,  from,  until);
+    updateWeights();
+}
+   // iterate(iteration_, batch_size_);
 }
 
-void softmax::zeroMeanData(){
+void ffnn::zeroMeanData(){
 meanLabel->setText(QString::fromUtf8("Wait..."));
 //compute the mean image
 
@@ -228,30 +237,9 @@ meanLabel->setText(QString::fromUtf8("Zero Mean dataset."));
     std::cout<<"Make dataset zero mean"<<"\n"; 
    zeroMeanButton->setEnabled(false); 
 }
-void softmax::CalcMeanSigma(const std::vector<double> data, double &mean, double &sigma){
-   mean = 0;
-    sigma=0;
-    for(int i=0; i<data.size();i++){
-            mean+=data[i];
-}
-    mean= mean/ data.size();
-    //std::cout<<"data size "<<data.size()<<"\n";
-    //sigma
 
-       for(int i=0; i<data.size();i++){
-        sigma += ( data[i]- mean)  * ( data[i] - mean);
-       // std::cout<<"( *it - mean) "<<( *it - mean)<<"\n";
-        //std::cout<<"sigma "<<sigma<<"\n";
-       // std::cin.get();
-    }
-  //std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
-    sigma=sqrt(sigma/(data.size()-1));  
-       
-// std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
-      //  std::cin.get();
-}
 
-void softmax::standartisation(){
+void ffnn::standartisation(){
 meanLabel->setText(QString::fromUtf8("Wait..."));
 //zero mean and sigma from  1
 //compute the mean image
@@ -307,22 +295,9 @@ for (int x = 0; x < 32; ++x) {
 for(int i=0; i<train_images.size();i++){
 for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-
-        //std::cout<<"before R "<<train_images[i][y*32+x]<<"\n";
-      //  std::cout<<"before G "<<train_images[i][1024+y*32+x]<<"\n";
-       // std::cout<<"before B "<< train_images[i][2048+y*32+x]<<"\n";
-
-         train_images[i][y*32+x]=(train_images[i][y*32+x]-red(x,y))/ redSigma(x,y);
+        train_images[i][y*32+x]=(train_images[i][y*32+x]-red(x,y))/ redSigma(x,y);
         train_images[i][1024+y*32+x]=(train_images[i][1024+y*32+x]-green(x,y))/ greenSigma(x,y);
         train_images[i][2048+y*32+x]=(train_images[i][2048+y*32+x]-blue(x,y))/  blueSigma(x,y);
-      //  std::cout<<"sigmaR "<<redSigma(x,y)<<"\n";
-       // std::cout<<"sigmaG "<<greenSigma(x,y)<<"\n";
-       // std::cout<<"sigmaB "<<blueSigma(x,y)<<"\n";
-
-       // std::cout<<"R "<<train_images[i][y*32+x]<<"\n";
-       // std::cout<<"G "<<train_images[i][1024+y*32+x]<<"\n";
-       // std::cout<<"B "<< train_images[i][2048+y*32+x]<<"\n";
-      //  std::cin.get();
     }
   }
 
@@ -347,8 +322,9 @@ meanLabel->setText(QString::fromUtf8("Standardized  dataset."));
    standardizationButton->setEnabled(false); 
 
 }
+
 //put the values zero mean and from at the intervall -1 to 1 y = (ymax-ymin)*(x-xmin)/(xmax-xmin) + ymin;
-void softmax::normalization(){
+void ffnn::normalization(){
 
 
 for(int i=0; i<train_images.size();i++){
@@ -376,19 +352,9 @@ for (int x = 0; x < 32; ++x) {
 
         for (int x = 0; x < 32; ++x) {
             for (int y = 0; y < 32; ++y) {
-       // std::cout<<"before R "<<train_images[i][y*32+x]<<"\n";
-       // std::cout<<"before G "<<train_images[i][1024+y*32+x]<<"\n";     
-       // std::cout<<"before B "<<train_images[i][2048+y*32+x]<<"\n";  
         train_images[i][y*32+x]=2*(train_images[i][y*32+x] -minR)/(maxR-minR)-1;
         train_images[i][1024+y*32+x]=2*(train_images[i][1024+y*32+x] -minG)/(maxG-minG)-1;
-        train_images[i][2048+y*32+x]=2*(train_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;  
-
-       // std::cout<<"R "<<train_images[i][y*32+x]<<"\n";
-      //  std::cout<<"G "<<train_images[i][1024+y*32+x]<<"\n";     
-       // std::cout<<"B "<<train_images[i][2048+y*32+x]<<"\n"; 
-
-   // std::cin.get();  
-  
+        train_images[i][2048+y*32+x]=2*(train_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;    
     }   
 
   }
@@ -420,17 +386,9 @@ for (int x = 0; x < 32; ++x) {
 
         for (int x = 0; x < 32; ++x) {
             for (int y = 0; y < 32; ++y) {
-        //std::cout<<"before R "<<test_images[i][y*32+x]<<"\n";
-       // std::cout<<"before G "<<test_images[i][1024+y*32+x]<<"\n";     
-        //std::cout<<"before B "<<test_images[i][2048+y*32+x]<<"\n";  
         test_images[i][y*32+x]=2*(test_images[i][y*32+x] -minR)/(maxR-minR)-1;
         test_images[i][1024+y*32+x]=2*(test_images[i][1024+y*32+x] -minG)/(maxG-minG)-1;
         test_images[i][2048+y*32+x]=2*(test_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;  
-
-       /// std::cout<<"R "<<test_images[i][y*32+x]<<"\n";
-       // std::cout<<"G "<<test_images[i][1024+y*32+x]<<"\n";     
-       // std::cout<<"B "<<test_images[i][2048+y*32+x]<<"\n";   
-  
     }   
 
   }
@@ -447,187 +405,107 @@ meanLabel->setText(QString::fromUtf8("Normalized dataset."));
 
 
 
-//calculate scores by using linear score function y=W*x for training
-void softmax::calculateScores(int from, int until, int batch){
-//for each image we should have vector of the size 10 (score for each class)
-//for all train set of the size N we will have matrix Nx10 of scores (in our case 50 000x10)
-  //init score matrix
-    score_.setSize(batch,categories.size());  // Nx10
-    score_.fill(0.0);
-    normalizer_.clear();
-
-    //for each image in train set compute the cost:
-    for(int i=from; i<until; i++){
-           int max_score=0;
-                      int a=i-from; 
-        for(int p=0;p<train_images[index_[i]].size();p++){
-            //cost(50000,10)  W(10, 3073)*image(3073,1)     
-   
- 
-
-            for (int label=0; label<10;label++){            
-             score_(a,label)+= W_(label,p)*train_images[index_[i]][p];
-                if(score_(a,label)>max_score){
-                    max_score=score_(a,label);
-                }
-            }
-            //normalize scores in order to avoid numerical issues we need to substract the max score from all scores 
-         
-        }
-           float normalizer=0;
-      for (int label=0; label<10;label++){            
-             score_(a,label)= exp(score_(a,label)- max_score);
-              normalizer+=score_(a,label);
-            }
-            normalizer_.push_back(normalizer);    
-    }
 
 
-}
-void softmax::iterate(int iter, int batch){
+void ffnn::resetWeights(){
 
-      progressBar->setValue(0);
-  int number_of_full_batches= train_images.size()/batch;
-   int last_batch= train_images.size()-number_of_full_batches*batch;
-
-    for(int i=0; i<iter;i++){
-
-     std::random_shuffle ( index_.begin(), index_.end() );//random batch sampling
-
-         itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
-         progressBar->setValue(0);  
-        for(int j=0;j<number_of_full_batches;j++){    
-                               if(stop_){return;}
-                
-               int progress = 100*j/number_of_full_batches;
-                progressBar->setValue(progress);       
-
-             int from=j*batch;
-             int until=j*batch+batch-1;    
-            calculateScores( from,  until, batch);
-           SoftmaxTraining( from,  until);
-            updateWeights();
-            lossResult->setText(QString::number(Loss_));
+  initRandomWeights();
     vizWeights();
-        } 
-    
-
-    calculatePerformance();
-    }
-
-       progressBar->setValue(100);
-}
-
-
-void softmax::resetWeights(){
-//init weight and scores matrices
-   initRandomWeights();
-    vizWeights();
-    int result = inference(currentIndex_);
-    lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
+   // int result = inference(currentIndex_);
+    //lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 
 }
-void softmax::updateWeights(){
+
+void ffnn::updateWeights(){
 float weight;
 float dw;   
 float scale1=0;
 float scale2=0;
- for(int x=0; x<dW_.xSize();x++){
-      // weight=0;
-      // dw=0;
 
-     for(int y=0; y<dW_.ySize();y++){
+ for(int x=0; x<dW1_.xSize();x++){
+       weight=0;
+       dw=0;
+     for(int y=0; y<dW1_.ySize();y++){
                    if(stop_){return;}
         //calculate the scale of weights and weight update
-        weight+=W_(x,y)*W_(x,y);
-         dw+= step_*dW_(x,y)*step_*dW_(x,y); 
-        W_(x,y)-= step_*dW_(x,y);
-       //  std::cout<<"dW["<<x<<"]["<<y<<"]="<<dW_(x,y)<<"  W["<<x<<"]["<<y<<"]="<<W_(x,y)<<"\n";
+        weight+=W1_(x,y)*W1_(x,y);
+         dw+= step_*dW1_(x,y)*step_*dW1_(x,y); 
+       W1_(x,y)-= step_*dW1_(x,y);
+       //  std::cout<<"dW1["<<x<<"]["<<y<<"]="<<dW1_(x,y)<<"  W1["<<x<<"]["<<y<<"]="<<W1_(x,y)<<"\n";
+ 
+        }
+    
+    }
+      // std::cin.get();
+
+    float a=sqrt(dw)/sqrt(weight);
+            weightRelation->setText(QString::number(a));
+ for(int x=0; x<dW2_.xSize();x++){
+      // weight=0;
+       //dw=0;
+     for(int y=0; y<dW2_.ySize();y++){
+                   if(stop_){return;}
+        //calculate the scale of weights and weight update
+      //  weight+=W2_(x,y)*W2_(x,y);
+        // dw+= step_*dW1_(x,y)*step_*dW1_(x,y); 
+       W2_(x,y)-= step_*dW2_(x,y);
+       // std::cout<<"dW2["<<x<<"]["<<y<<"]="<<dW2_(x,y)<<"  W2["<<x<<"]["<<y<<"]="<<W2_(x,y)<<"\n";
+ 
         }
        // scale1
     
     }
-
-    float a=sqrt(dw)/sqrt(weight);
-            weightRelation->setText(QString::number(a));
-}
-
-//SoftmaxTraining  function
-void softmax::SoftmaxTraining(int from, int until){
-
-    dW_.fill(0); //reset grad update matrix
-    loss_.clear(); //compute loss for each image
-
-    for(int i=from; i<until; i++){
-          QCoreApplication::processEvents();
-           if(stop_){return;}
-          int a=i-from;
-          double y=score_(a,train_labels[index_[i]]);//right  exp(score)
-         
-           //compute  softmax loss
-            double softmax=y/normalizer_[a];
-            loss_.push_back(-log(softmax));
-
-            for(int dx=0; dx<dW_.xSize();dx++){
-                for(int dy=0; dy<dW_.ySize();dy++){
-                               
-                 if(train_labels[index_[i]]==dx){ //if this is correct label row of weights
-                          
-                dW_(dx,dy)+=train_images[index_[i]][dy]*(softmax-1)+lambda_*W_(dx,dy);
-                         
-                }else if(train_labels[index_[i]]!=dx){    
-                    dW_(dx,dy)+= train_images[index_[i]][dy]*score_(a,dx)/normalizer_[a] +lambda_*W_(dx,dy);                  
-                }                  
-            }
-        }
-           
-    }
-
-
-   float Loss = std::accumulate(loss_.begin(), loss_.end(), 0.0);
-
-   float regularization=0;
-        for(int y=0;y<W_.ySize();y++){
-            for(int x=0;x<W_.xSize();x++){
-               regularization+= W_(x,y)*W_(x,y);
-
-            }           
-
-        }
-
-        regularization=0.5*lambda_*regularization;
-        Loss_=Loss/ loss_.size()+ regularization;
-    
-
+    //  std::cin.get();
 
 }
 
-void softmax::initRandomWeights(){
-  W_.setSize(categories.size(),train_images[0].size()); //weight matrix
+
+
+void ffnn::initRandomWeights(){
+//Layer 1 weights
+  //weight matrix for the first layer size:  L1_neurons_ x 32x32x3 +1 
+  //should be  30x3073 if L1_neurons_=30
+     W1_.setSize( L1_neurons_,train_images[0].size());
+//Layer 2 weights
+  //weight matrix for the second layer size:  L2_neurons_ x L1_neurons_ +1 
+  //should be  10x31 if L1_neurons_=30
+     W2_.setSize( L2_neurons_,L1_neurons_+1);//weight matrix
+
 
  std::default_random_engine generator;
-  std::normal_distribution<double> distribution(0,0.00001);
+  std::normal_distribution<double> distribution(0,0.001);
 
-    for(int x=0; x<W_.xSize();x++){
-      for(int y=0;y<W_.ySize();y++){  
-        
-            W_(x,y)=distribution(generator);
-            if(y==W_.ySize()-1){ //make the weight for bias positive (better for initialization)
-                W_(x,y)=fabs( W_(x,y));
-            }
-           
-           
+    for(int x=0; x<W1_.xSize();x++){
+      for(int y=0;y<W1_.ySize();y++){         
+            W1_(x,y)=distribution(generator);
+            if(y==W1_.ySize()-1){ //make the weight for bias positive (better for initialization with relu)
+                W1_(x,y)=fabs( W1_(x,y));
+            }                   
+        }
+    }
+
+    for(int x=0; x<W2_.xSize();x++){
+      for(int y=0;y<W2_.ySize();y++){         
+            W2_(x,y)=distribution(generator);
+            if(y==W2_.ySize()-1){ //make the weight for bias positive (better for initialization with relu)
+                W2_(x,y)=fabs( W2_(x,y));
+            }                   
         }
     }
 
 }
 
-void softmax::init(){
+void ffnn::init(){
+//number 
+
+   L1_neurons_ = 30;//number of neurons in hidden layer
+   L2_neurons_ = 10; //number of outputs should be 10 for CIFAR 10
+
+
 //add indices from 0 to 49 999 to the index_ vector for random batch sampling
 for(int i=0;i<50000;i++){
     index_.push_back(i);
 }
-
   //fill the cathegory names
   categories.push_back("airplane");
   categories.push_back("automobile");
@@ -639,8 +517,6 @@ for(int i=0;i<50000;i++){
   categories.push_back("horse");
   categories.push_back("ship");
   categories.push_back("truck");
-
-
 // init!!!
     iteration_=1;
     batch_size_=100;
@@ -649,13 +525,9 @@ for(int i=0;i<50000;i++){
  //init weight and scores matrices
    initRandomWeights();
     vizWeights();
-//W_.setSize(categories.size(),train_images[0].size()); //weight matrix
-//W_.fill(0.00001); //weight matrix
-    dW_.setSize(categories.size(),train_images[0].size()); //gradient update matrix
-    
 
-
-
+    dW1_.setSize( L1_neurons_,train_images[0].size()); //gradient update matrix
+    dW2_.setSize(L2_neurons_,L1_neurons_+1);
 
 //Qt init
   //show the first picture in dataset
@@ -676,13 +548,13 @@ for(int i=0;i<50000;i++){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-    int result = inference(currentIndex_);
+   // int result = inference(currentIndex_);
   
-    lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
+  //  lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
 
 
-void softmax::updateImage(){
+void ffnn::updateImage(){
     if( numberBox->value()>=test_images.size()){
 
         numberBox->setValue(test_images.size()-1);
@@ -704,53 +576,15 @@ void softmax::updateImage(){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-    int result = inference(index);
+   // int result = inference(index);
    
 
-    lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
-}
-int softmax::inference(int test_picture_index){
-
-  std::vector<float> score(10,0);  
-
-        for(int p=0;p<test_images[test_picture_index].size();p++){
-                
-            score[0]+= W_(0,p)*test_images[test_picture_index][p];
-            score[1]+= W_(1,p)*test_images[test_picture_index][p];
-            score[2]+= W_(2,p)*test_images[test_picture_index][p];
-            score[3]+= W_(3,p)*test_images[test_picture_index][p];
-            score[4]+= W_(4,p)*test_images[test_picture_index][p];
-            score[5]+= W_(5,p)*test_images[test_picture_index][p];
-            score[6]+= W_(6,p)*test_images[test_picture_index][p];
-            score[7]+= W_(7,p)*test_images[test_picture_index][p];
-            score[8]+= W_(8,p)*test_images[test_picture_index][p];
-            score[9]+= W_(9,p)*test_images[test_picture_index][p];
-
-
-        }
-
- return  std::max_element(score.begin(), score.end())- score.begin();
+  //  lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
 
-void softmax::calculatePerformance(){
-
-     float acc=0;
- for(int i=0; i<test_labels.size();i++){
 
 
-          int prediction=inference(i);
-
-        acc+= prediction == test_labels[i];
-    }
-    progressBar->setValue(0);
-    acc=acc/test_labels.size();
-std::cout<<"Acc: "<<acc<<"\n";
-accResult->setText(QString::number(acc));
-
-
-}
-
-bool softmax::trainSetread(const char* dirname){
+bool ffnn::trainSetread(const char* dirname){
 train_images.clear();
 train_labels.clear();
     QDir dir(dirname);
@@ -811,7 +645,7 @@ train_labels.clear();
 }
 
 
-bool softmax::testSetread(const char* dirname){
+bool ffnn::testSetread(const char* dirname){
 test_labels.clear();
 test_images.clear();
     QDir dir(dirname);
@@ -866,15 +700,188 @@ test_images.clear();
     return true;
 }
 
-void softmax::open(){
+void ffnn::open(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-   //if(images.size()!=0){
-  //          std::cout<<"Dataset already uploaded"<<"\n";
-  //      return;
-  //      }
+
     if( trainSetread(folder_path.toUtf8().constData())&& testSetread(folder_path.toUtf8().constData())){      
             init();
        } 
 
 
 }
+
+
+
+
+//neural network functions
+
+CMatrix<float> ffnn::calculateScoresLayer1(int from, int until ){
+    int batch=until - from;
+    //std::cout<<"batch "<<batch<<"\n";
+   // std::cin.get();
+  //init score matrix
+    CMatrix<float> result(batch, W1_.xSize(),0);
+
+    //for each image in batch compute the cost:
+    for(int i=from; i<until; i++){
+            int a=i-from; 
+        for(int p=0;p<train_images[index_[i]].size();p++){
+             
+            for (int u=0; u<W1_.xSize();u++){            
+                result(a,u)+= W1_(u,p)*train_images[index_[i]][p];
+
+            }
+
+         
+        }
+//for (int u=0; u<W1_.xSize();u++){            
+              //    std::cout<<"score1 "<< result(a,u)<<"\n";
+             //   std::cin.get(); 
+   //         }
+                    
+    }
+  return result;
+}
+CMatrix<float> ffnn::ReLU(CMatrix<float> scores){
+
+  CMatrix<float> result(scores.xSize(),scores.ySize()+1);
+
+    for(int x=0;x<scores.xSize();x++){//batch
+        for(int y=0;y<scores.ySize();y++){//scores
+           result(x,y)=std::max((float)0,scores(x,y));
+
+        }
+        result(x,scores.ySize())=1;//add bias
+    }
+
+    return result;
+}
+
+CMatrix<float> ffnn::calculateScoresLayer2(CMatrix<float> data){
+ normalizer_.clear();
+
+          CMatrix<float> result(data.xSize(), W2_.xSize(),0);
+           // std::cout<<"w2 x "<<W2_.xSize()<<"\n";
+           // std::cout<<"w2 y "<<W2_.ySize()<<"\n";
+
+          //  std::cin.get();
+    //compute the cost
+        for(int i=0;i<data.xSize();i++){//for all batch
+                 int max_score=0;//normalization of the values in order to avoid numerical issues with softmax loss
+            for(int p=0;p<data.ySize();p++){ //for each output vector from previous layer
+                            
+                 for(int u=0; u<W2_.xSize(); u++){
+
+                    result(i,u)+=W2_(u,p)* data(i,p);   
+                     if(result(i,u)>max_score){
+                    max_score=result(i,u);
+                }
+            }
+ 
+        }
+            float normalizer=0;
+              for (int u=0; u<W2_.xSize(); u++){            
+            result(i,u) = exp(result(i,u)- max_score);
+
+               //   std::cout<<"scores2["<<i<<"]["<<u<<"]="<<  result(i,u)<<"\n";
+              normalizer+=result(i,u);
+            }
+
+
+             //   std::cin.get();
+            normalizer_.push_back(normalizer);  
+
+
+    }
+
+    return result;
+
+}
+
+void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int until){
+    dW1_.fill(0); //reset grad update matrix
+    dW2_.fill(0); //reset grad update matrix
+    loss_.clear(); //compute loss for each image
+
+   //compute the loss
+     //for all batch   
+    for(int i=from; i<until; i++){
+                  int a=i-from;
+
+         float y=scores(a,train_labels[index_[i]]);//right  exp(score)
+           //compute  softmax loss
+            float softmax=y/normalizer_[a];
+            loss_.push_back(-log(softmax));
+
+
+    CMatrix<float> d2_propagate(dW2_.xSize(),dW2_.ySize(),0);
+        //update weights for the layer 2
+
+         for(int dx=0; dx<dW2_.xSize();dx++){//10
+                for(int dy=0; dy<dW2_.ySize();dy++){//31
+                               
+                 if(train_labels[index_[i]]==dx){ //if this is correct label row of weights
+                          
+                  dW2_(dx,dy)+=relu(a,dy)*(softmax-1);
+                  d2_propagate(dx,dy)=  (softmax-1);     
+                }else if(train_labels[index_[i]]!=dx){    
+
+                     dW2_(dx,dy)+= relu(a,dy)*scores(a,dx); 
+                     d2_propagate(dx,dy)= scores(a,dx)/normalizer_[a];             
+                }
+          //             std::cout<<"dW2["<<dx<<"]["<<dy<<"]="<<dW2_(dx,dy)<<"\n";
+          //  std::cin.get();                  
+            }
+
+     }
+
+     //backward propagation of the dW2_  for each image until layer 1
+
+     //gradient before ReLU   
+    std::vector<float> grad(dW2_.ySize()-1,0);
+     for(int dy=0; dy<dW2_.ySize()-1;dy++){//31
+                      //  std::cout<<"dy "<<dy<<"\n";
+                      //  std::cout<<"dx "<<dW2_.xSize()<<"\n";
+            float result=0;
+            //gradient before ReLU   
+            for(int dx=0; dx<dW2_.xSize();dx++){//10
+                       //result+=  d2_propagate(dx,dy); 
+
+                        result+=  d2_propagate(dx,dy)*W2_(dx,dy); 
+
+                }
+               // std::cout<<"result "<<result<<"\n";
+               // std::cin.get();
+             //gradient afrer ReLU 
+               if(relu(a,dy)>0){ 
+                    grad[dy]=result;
+            }
+        }
+
+  
+   //update weights for the layer 1
+         for(int dx=0; dx<dW1_.xSize();dx++){//30
+                for(int dy=0; dy<dW1_.ySize();dy++){//3073                                           
+                         
+                dW1_(dx,dy)+=train_images[index_[i]][dy]*grad[dx];
+           //                                std::cout<<"dW1["<<dx<<"]["<<dy<<"]="<<dW1_(dx,dy)<<"\n";
+           // std::cin.get();
+            }
+ 
+     }  
+        
+
+}
+
+
+   float Loss = std::accumulate(loss_.begin(), loss_.end(), 0.0);
+
+        Loss_=Loss/ loss_.size();
+
+    std::cout<<"loss "<<Loss_<<"\n";
+}
+
+
+
+
+
