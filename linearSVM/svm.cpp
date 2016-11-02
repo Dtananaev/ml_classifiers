@@ -459,21 +459,21 @@ void svm::SVMtraining(int from, int until){
 
     dW_.fill(0); //reset grad update matrix
     loss_.clear(); //compute loss for each image
-
+    int N=until-from;
     for(int i=from; i<until; i++){
           QCoreApplication::processEvents();
            if(stop_){return;}
           int a=i-from;
           float y=score_(a,train_labels[i]);//right score
-          std::vector<float> score(10,0);
+          std::vector<float> SVMloss(10,0);
           //for grad update compute how many times loss more than 0
           int counter=0; 
           
         for(int j=0;j<score_.ySize();j++){                
 
                 if(train_labels[i]!=j){
-                     score[j]=std::max(0.0, score_(a,j)-y +1.0) ;                             
-                     counter+=( score[j]>0);
+                     SVMloss[j]=std::max(0.0, score_(a,j)-y +1.0) ;                             
+                     counter+=( SVMloss[j]>0);
             }                       
           }
             for(int dx=0; dx<dW_.xSize();dx++){
@@ -482,32 +482,27 @@ void svm::SVMtraining(int from, int until){
                     
                  if(train_labels[i]==dx){ //if this is correct label row of weights
             
-                    dW_(dx,dy)+=-1*counter*train_images[i][dy] +lambda_*W_(dx,dy) ;//second term is regularizer             
+                    dW_(dx,dy)+=-1*counter*train_images[i][dy]/N +lambda_*W_(dx,dy) ;//second term is regularizer             
                 }else if(train_labels[i]!=dx){    
-                    dW_(dx,dy)+= (score[dx]>0) *train_images[i][dy] +lambda_*W_(dx,dy);                  
+                    dW_(dx,dy)+= (SVMloss[dx]>0) *train_images[i][dy]/N +lambda_*W_(dx,dy);                  
                 }                  
             }
         }
-           loss_.push_back(std::accumulate(score.begin(), score.end(), 0.0));
+           loss_.push_back(std::accumulate(SVMloss.begin(), SVMloss.end(), 0.0));
     }
 
-
    float Loss = std::accumulate(loss_.begin(), loss_.end(), 0.0);
-
    float regularization=0;
         for(int y=0;y<W_.ySize();y++){
             for(int x=0;x<W_.xSize();x++){
                regularization+= W_(x,y)*W_(x,y);
-
             }           
-
         }
 
         regularization=0.5*lambda_*regularization;
         Loss_=Loss/ loss_.size()+ regularization;
     
-       // std::cout<<"regularization "<<regularization<<"\n";
-        //std::cout<<"Loss "<< Loss_<<"\n";
+
 
 }
 
@@ -523,9 +518,7 @@ void svm::initRandomWeights(){
             W_(x,y)=distribution(generator);
             if(y==W_.ySize()-1){ //make the weight for bias positive (better for initialization)
                 W_(x,y)=fabs( W_(x,y));
-            }
-           
-           
+            }                
         }
     }
 
@@ -554,8 +547,6 @@ void svm::init(){
  //init weight and scores matrices
    initRandomWeights();
     vizWeights();
-//W_.setSize(categories.size(),train_images[0].size()); //weight matrix
-//W_.fill(0.00001); //weight matrix
     dW_.setSize(categories.size(),train_images[0].size()); //gradient update matrix
     
 
