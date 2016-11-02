@@ -168,6 +168,7 @@ void svm::updateLambda(){
 }
 void svm::runTraining(){
     stop_=false;
+    std::cout<<"qwerty"<<"\n";
     SVMiterate(iteration_, batch_size_);
 }
 
@@ -219,26 +220,29 @@ meanLabel->setText(QString::fromUtf8("Zero Mean dataset."));
 
 
 void svm::SVMiterate(int iter, int batch){
-
+         std::cout<<"1"<<"\n";
       progressBar->setValue(0);
   int number_of_full_batches= train_images.size()/batch;
-
+    std::cout<<"2"<<"\n";
    int last_batch= train_images.size()-number_of_full_batches*batch;
-
-    for(int i=0; i<iter;i++){
-
+    std::cout<<"3"<<"\n";
+    for(int i=0; i<=iter;i++){
+        std::cout<<"4"<<"\n";
          itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
          progressBar->setValue(0);  
         for(int j=0;j<number_of_full_batches;j++){    
                                if(stop_){return;}
-                
+                    std::cout<<"15"<<"\n";
                int progress = 100*j/number_of_full_batches;
                 progressBar->setValue(progress);       
-
+    std::cout<<"6"<<"\n";
              int from=j*batch;
              int until=j*batch+batch-1;    
+
+            std::cout<<"11111"<<"\n";
             Loss_=loss(train_images, train_labels,  from, until);
 
+            std::cout<<"22222"<<"\n";
             lossResult->setText(QString::number(Loss_));
     vizWeights();
         } 
@@ -535,8 +539,8 @@ float svm::loss_one_image(const std::vector<int> &image, const int &y){
     for(int c=0; c<C; ++c){
         for(int d=0; d<D; ++d){
             scores[c] += W_(c,d)*image[d];
-   //  std::cout<<"score "<<scores[c]<<"\n";
-     //   std::cin.get();        
+     //std::cout<<"score "<<scores[c]<<"\n";
+      //  std::cin.get();        
     }
            
         }
@@ -599,7 +603,7 @@ float svm::loss(const std::vector< std::vector<int> > &images, const std::vector
             W_(x, y) += -step_*dW_(x, y);
         }
     }
-
+    std::cout<<"loss "<<L <<"\n";
     return L;
 }
 
