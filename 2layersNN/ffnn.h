@@ -78,12 +78,14 @@ public:
     void vizWeights();
 
 //Neural-Network functions
-    CMatrix<float> calculateScoresLayer1(int from, int until );
-    CMatrix<float> ReLU(CMatrix<float> scores);
-    CMatrix<float> calculateScoresLayer2(CMatrix<float> data);
+   void  calculateScoresLayer1(int from, int until, CMatrix<float> &result);
+    void ReLU(CMatrix<float> scores, CMatrix<float> &result);
+    void calculateScoresLayer2(CMatrix<float> data,  CMatrix<float> &result);
     void softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int until);
 
-    
+    void iterate(int iter, int batch);
+    int inference(int test_picture_index);
+    void calculatePerformance();
 private slots:
     void open();
 

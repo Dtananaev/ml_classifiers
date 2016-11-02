@@ -166,20 +166,67 @@ void ffnn::updateLambda(){
     lambda_=lambdaBox->value();
 }
 
+
+void ffnn::iterate(int iter, int batch){
+
+      progressBar->setValue(0);
+  int number_of_full_batches= train_images.size()/batch;
+   int last_batch= train_images.size()-number_of_full_batches*batch;
+
+
+    CMatrix<float> score1(batch, W1_.xSize(),0);
+    CMatrix<float> relu(score1.xSize(),score1.ySize()+1,0);
+    CMatrix<float> score2(relu.xSize(), W2_.xSize(),0);
+
+    for(int i=0; i<iter;i++){
+
+     std::random_shuffle ( index_.begin(), index_.end() );//random batch sampling
+
+         itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
+         progressBar->setValue(0);  
+        for(int j=0;j<number_of_full_batches;j++){    
+                               if(stop_){return;}
+                
+               int progress = 100*j/number_of_full_batches;
+                progressBar->setValue(progress);       
+
+             int from=j*batch;
+             int until=j*batch+batch-1;    
+             calculateScoresLayer1( from,  until, score1 );
+             ReLU(score1, relu);
+             calculateScoresLayer2(relu,score2);
+             softmaxLoss(score2,relu,  from,  until);
+             updateWeights();
+            lossResult->setText(QString::number(Loss_));
+    vizWeights();
+        } 
+    
+
+    calculatePerformance();
+    }
+
+       progressBar->setValue(100);
+}
+
+
 void ffnn::runTraining(){
     stop_=false;
+/*
     int from = 0; 
     int until =1000;
+    int batch= until-from;
+   
     for(int i=0;i<iteration_;i++){
- QCoreApplication::processEvents();
+     QCoreApplication::processEvents();
            if(stop_){return;}
-    CMatrix<float> score1=calculateScoresLayer1( from,  until );
-    CMatrix<float> relu= ReLU(score1);
-    CMatrix<float> score2=calculateScoresLayer2(relu);
+    calculateScoresLayer1( from,  until, score1 );
+    ReLU(score1, relu);
+    calculateScoresLayer2(relu,score2);
     softmaxLoss(score2,relu,  from,  until);
     updateWeights();
 }
-   // iterate(iteration_, batch_size_);
+*/
+    iterate(iteration_, batch_size_);
 }
 
 void ffnn::zeroMeanData(){
@@ -411,8 +458,8 @@ void ffnn::resetWeights(){
 
   initRandomWeights();
     vizWeights();
-   // int result = inference(currentIndex_);
-    //lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
+    int result = inference(currentIndex_);
+    lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 
 }
 
@@ -498,7 +545,7 @@ void ffnn::initRandomWeights(){
 void ffnn::init(){
 //number 
 
-   L1_neurons_ = 30;//number of neurons in hidden layer
+   L1_neurons_ = 70;//number of neurons in hidden layer
    L2_neurons_ = 10; //number of outputs should be 10 for CIFAR 10
 
 
@@ -548,9 +595,9 @@ for(int i=0;i<50000;i++){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-   // int result = inference(currentIndex_);
+    int result = inference(currentIndex_);
   
-  //  lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
+   lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
 
 
@@ -576,13 +623,25 @@ void ffnn::updateImage(){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-   // int result = inference(index);
+    int result = inference(index);
    
 
-  //  lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
+    lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
 
+void ffnn::calculatePerformance(){
 
+     float acc=0;
+ for(int i=0; i<test_labels.size();i++){
+          int prediction=inference(i);
+          acc+= prediction == test_labels[i];
+    }
+    acc=acc/test_labels.size();
+std::cout<<"Acc: "<<acc<<"\n";
+accResult->setText(QString::number(acc));
+
+
+}
 
 bool ffnn::trainSetread(const char* dirname){
 train_images.clear();
@@ -715,12 +774,12 @@ void ffnn::open(){
 
 //neural network functions
 
-CMatrix<float> ffnn::calculateScoresLayer1(int from, int until ){
+void ffnn::calculateScoresLayer1(int from, int until, CMatrix<float>  &result){
     int batch=until - from;
-    //std::cout<<"batch "<<batch<<"\n";
-   // std::cin.get();
+
   //init score matrix
-    CMatrix<float> result(batch, W1_.xSize(),0);
+    result.fill(0);
+    //CMatrix<float> result(batch, W1_.xSize(),0);
 
     //for each image in batch compute the cost:
     for(int i=from; i<until; i++){
@@ -740,12 +799,12 @@ CMatrix<float> ffnn::calculateScoresLayer1(int from, int until ){
    //         }
                     
     }
-  return result;
+ // return result;
 }
-CMatrix<float> ffnn::ReLU(CMatrix<float> scores){
+void ffnn::ReLU(CMatrix<float> scores, CMatrix<float> &result){
 
-  CMatrix<float> result(scores.xSize(),scores.ySize()+1);
-
+  //CMatrix<float> result(scores.xSize(),scores.ySize()+1);
+result.fill(0);
     for(int x=0;x<scores.xSize();x++){//batch
         for(int y=0;y<scores.ySize();y++){//scores
            result(x,y)=std::max((float)0,scores(x,y));
@@ -754,17 +813,13 @@ CMatrix<float> ffnn::ReLU(CMatrix<float> scores){
         result(x,scores.ySize())=1;//add bias
     }
 
-    return result;
+  //  return result;
 }
 
-CMatrix<float> ffnn::calculateScoresLayer2(CMatrix<float> data){
+void ffnn::calculateScoresLayer2(CMatrix<float> data, CMatrix<float> &result){
  normalizer_.clear();
+    result.fill(0);
 
-          CMatrix<float> result(data.xSize(), W2_.xSize(),0);
-           // std::cout<<"w2 x "<<W2_.xSize()<<"\n";
-           // std::cout<<"w2 y "<<W2_.ySize()<<"\n";
-
-          //  std::cin.get();
     //compute the cost
         for(int i=0;i<data.xSize();i++){//for all batch
                  int max_score=0;//normalization of the values in order to avoid numerical issues with softmax loss
@@ -783,18 +838,17 @@ CMatrix<float> ffnn::calculateScoresLayer2(CMatrix<float> data){
               for (int u=0; u<W2_.xSize(); u++){            
             result(i,u) = exp(result(i,u)- max_score);
 
-               //   std::cout<<"scores2["<<i<<"]["<<u<<"]="<<  result(i,u)<<"\n";
+
               normalizer+=result(i,u);
             }
 
 
-             //   std::cin.get();
             normalizer_.push_back(normalizer);  
 
 
     }
 
-    return result;
+    //return result;
 
 }
 
@@ -802,10 +856,12 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
     dW1_.fill(0); //reset grad update matrix
     dW2_.fill(0); //reset grad update matrix
     loss_.clear(); //compute loss for each image
-
+    int N=until-from; //number of training images in batch
    //compute the loss
      //for all batch   
     for(int i=from; i<until; i++){
+         QCoreApplication::processEvents();
+           if(stop_){return;}
                   int a=i-from;
 
          float y=scores(a,train_labels[index_[i]]);//right  exp(score)
@@ -822,11 +878,11 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
                                
                  if(train_labels[index_[i]]==dx){ //if this is correct label row of weights
                           
-                  dW2_(dx,dy)+=relu(a,dy)*(softmax-1);
+                  dW2_(dx,dy)+=relu(a,dy)*(softmax-1)/N;
                   d2_propagate(dx,dy)=  (softmax-1);     
                 }else if(train_labels[index_[i]]!=dx){    
 
-                     dW2_(dx,dy)+= relu(a,dy)*scores(a,dx); 
+                     dW2_(dx,dy)+= relu(a,dy)*scores(a,dx)/N + lambda_*W2_(dx,dy); 
                      d2_propagate(dx,dy)= scores(a,dx)/normalizer_[a];             
                 }
           //             std::cout<<"dW2["<<dx<<"]["<<dy<<"]="<<dW2_(dx,dy)<<"\n";
@@ -863,7 +919,7 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
          for(int dx=0; dx<dW1_.xSize();dx++){//30
                 for(int dy=0; dy<dW1_.ySize();dy++){//3073                                           
                          
-                dW1_(dx,dy)+=train_images[index_[i]][dy]*grad[dx];
+                dW1_(dx,dy)+=train_images[index_[i]][dy]*grad[dx]/N +lambda_*W1_(dx,dy);
            //                                std::cout<<"dW1["<<dx<<"]["<<dy<<"]="<<dW1_(dx,dy)<<"\n";
            // std::cin.get();
             }
@@ -876,12 +932,65 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
 
    float Loss = std::accumulate(loss_.begin(), loss_.end(), 0.0);
 
-        Loss_=Loss/ loss_.size();
+   float regularization=0;
+        for(int y=0;y<W1_.ySize();y++){
+            for(int x=0;x<W1_.xSize();x++){
+               regularization+= W1_(x,y)*W1_(x,y);
 
-    std::cout<<"loss "<<Loss_<<"\n";
+            }           
+
+        }
+
+        for(int y=0;y<W2_.ySize();y++){
+            for(int x=0;x<W2_.xSize();x++){
+               regularization+= W2_(x,y)*W2_(x,y);
+
+            }           
+
+        }
+
+        regularization=0.5*lambda_*regularization;
+        Loss_=Loss/ loss_.size() +regularization;
+
+   // std::cout<<"loss "<<Loss_<<"\n";
 }
 
 
+int ffnn::inference(int test_picture_index){
+
+  std::vector<float> score(10,0);  
+
+    //calculate scores1  
+    std::vector<float> score1(L1_neurons_,0);
+ //   std::cout<<"W1_sizex "<<W1_.xSize()<<"\n";
+ //  std::cout<<"W1_sizey "<<W1_.ySize()<<"\n";
+        for(int p=0;p<test_images[test_picture_index].size();p++){           
+            for (int u=0; u<W1_.xSize();u++){            
+                score1[u]+= W1_(u,p)*test_images[test_picture_index][p];
+            }         
+        }
+
+
+    //relu
+    std::vector<float> relu(L1_neurons_,0);
+    for(int x=0;x<L1_neurons_;x++){//batch
+           relu[x]=std::max((float)0,score1[x]);
+        }
+        relu.push_back(1); //bias
+
+  for(int p=0;p<relu.size();p++){ //for each output vector from previous layer
+                            
+                 for(int u=0; u<W2_.xSize(); u++){
+
+                 score[u]+=W2_(u,p)* relu[p];   
+        
+                }
+            }
+      
+
+
+ return  std::max_element(score.begin(), score.end())- score.begin();
+}
 
 
 
