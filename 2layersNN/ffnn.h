@@ -62,6 +62,7 @@ public slots:
     void standartisation();
     void normalization();
     void stopClicked();
+    void updatNeuronNumber(); 
 public:
 
     explicit ffnn(QWidget *parent = 0);
@@ -107,7 +108,7 @@ private:
       CMatrix<float> W2_;//weight matrix
       CMatrix<float> dW1_;//gradient weight matrix
       CMatrix<float> dW2_;//gradient weight matrix
-     // CMatrix<float> score_;  //cost matrix   
+   
       std::vector<float> loss_; //vector of loss for each data sample
     std::vector<float> normalizer_;
 

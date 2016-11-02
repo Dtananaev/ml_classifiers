@@ -35,7 +35,7 @@ svm::svm(QWidget *parent):  QMainWindow(parent){
   connect(trainButton, SIGNAL(clicked()), this, SLOT(runTraining()));
   connect(resetWeightsButton, SIGNAL(clicked()), this, SLOT(resetWeights()));
   connect(zeroMeanButton, SIGNAL(clicked()), this, SLOT(zeroMeanData()));
-  connect(normalizationButton, SIGNAL(clicked()), this, SLOT(fullNormalization()));
+
 
 
  connect(stepBox, SIGNAL(valueChanged(double)), this, SLOT(updateStep()));
@@ -214,204 +214,19 @@ meanLabel->setText(QString::fromUtf8("Zero Mean dataset."));
     std::cout<<"Make dataset zero mean"<<"\n"; 
    zeroMeanButton->setEnabled(false); 
 }
-void svm::CalcMeanSigma(const std::vector<double> data, double &mean, double &sigma){
-   mean = 0;
-    sigma=0;
-    for(int i=0; i<data.size();i++){
-            mean+=data[i];
-}
-    mean= mean/ data.size();
-    //std::cout<<"data size "<<data.size()<<"\n";
-    //sigma
-
-       for(int i=0; i<data.size();i++){
-        sigma += ( data[i]- mean)  * ( data[i] - mean);
-       // std::cout<<"( *it - mean) "<<( *it - mean)<<"\n";
-        //std::cout<<"sigma "<<sigma<<"\n";
-       // std::cin.get();
-    }
-  //std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
-    sigma=sqrt(sigma/(data.size()-1));  
-       
-// std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
-      //  std::cin.get();
-}
-
-void svm::fullNormalization(){
-meanLabel->setText(QString::fromUtf8("Wait..."));
-//zero mean and dispersion from -1 to 1
-//compute the mean image
-
-//for each image and each channel calculate the mean value
-std::vector<double> red;
-std::vector<double> green;
-std::vector<double> blue;
-/*
-for(int i=0; i<test_images.size();i++){
-    red.clear();
-    green.clear();
-    blue.clear();
 
 
-    for (int y = 0; y < 32; ++y) {
-for (int x = 0; x < 32; ++x) {
-         red.push_back(test_images[i][y*32+x]);
-         green.push_back(test_images[i][1024+y*32+x]);
-         blue.push_back(test_images[i][2048+y*32+x]);
-    }
-  }
-
-    //finding the meat and covariance
-    //for red  
-    double meanRed; 
-    double sigmaRed;
-    CalcMeanSigma(red, meanRed, sigmaRed);
-      double meanGreen;
-    double sigmaGreen;
-    CalcMeanSigma(green, meanGreen, sigmaGreen);
-      double meanBlue; 
-double sigmaBlue;
-    CalcMeanSigma(blue, meanBlue, sigmaBlue);
-
-// Normalization (make z tranform ) 
-//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
 
 
-for (int i=0;i<red.size(); i++ )
-{
-
-    red[i]=(red[i]-meanRed)/sigmaRed;
-
-}
-
-
-for (int i=0;i<green.size(); i++ )
-{
-    green[i]=(green[i]-meanGreen)/sigmaGreen;
-}
-
-
-for (int i=0;i<blue.size(); i++ )
-{
-    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
-}
-
-std::vector<double> result=red;
-result.insert(result.end(), green.begin(), green.end()); 
-result.insert(result.end(), blue.begin(), blue.end()); 
- 
-  //  result.push_back(1);    
-//test_images[i]=result;
-std::copy( result.begin(), result.end(), test_images[i].begin() );
-}
-*/
-for(int i=0; i<train_images.size();i++){
-    red.clear();
-    green.clear();
-    blue.clear();
-
-
-    for (int y = 0; y < 32; ++y) {
-for (int x = 0; x < 32; ++x) {
-         red.push_back(train_images[i][y*32+x]);
-         green.push_back(train_images[i][1024+y*32+x]);
-         blue.push_back(train_images[i][2048+y*32+x]);
-    }
-  }
-
-    //finding the meat and covariance
-    //for red  
-    double meanRed; 
-    double sigmaRed;
-    CalcMeanSigma(red, meanRed, sigmaRed);
-      double meanGreen;
-    double sigmaGreen;
-    CalcMeanSigma(green, meanGreen, sigmaGreen);
-      double meanBlue; 
-double sigmaBlue;
-    CalcMeanSigma(blue, meanBlue, sigmaBlue);
-
-// Normalization (make z tranform ) 
-//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
-
-
-for (int i=0;i<red.size(); i++ )
-{
-
-    red[i]=(red[i]-meanRed)/sigmaRed;
-
-}
-
-
-for (int i=0;i<green.size(); i++ )
-{
-    green[i]=(green[i]-meanGreen)/sigmaGreen;
-}
-
-
-for (int i=0;i<blue.size(); i++ )
-{
-    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
-}
-
-std::vector<double> result=red;
-result.insert(result.end(), green.begin(), green.end()); 
-result.insert(result.end(), blue.begin(), blue.end()); 
- 
-  //  result.push_back(1);    
-//train_images[i]=result;
-std::copy( result.begin(), result.end(), train_images[i].begin() );
-}
-
-  
-
-
-meanLabel->setText(QString::fromUtf8("Normalized dataset."));
-    std::cout<<"Make dataset normalized"<<"\n"; 
-   zeroMeanButton->setEnabled(false); 
-   normalizationButton->setEnabled(false); 
-}
-//calculate scores by using linear score function y=W*x for training
-void svm::calculateScores(int from, int until, int batch){
-//for each image we should have vector of the size 10 (score for each class)
-//for all train set of the size N we will have matrix Nx10 of scores (in our case 50 000x10)
-  //init score matrix
-    score_.setSize(batch,categories.size());  // Nx10
-    score_.fill(0.0);
-    //std::cout<<"u-f "<<until-from<<"\n";
-
-    //for each image in train set compute the cost:
-    for(int i=from; i<until; i++){
-        for(int p=0;p<train_images[i].size();p++){
-            //cost(50000,10)  W(10, 3073)*image(3073,1)     
-            int a=i-from;              
-            score_(a,0)+= W_(0,p)*train_images[i][p];
-            score_(a,1)+= W_(1,p)*train_images[i][p];
-            score_(a,2)+= W_(2,p)*train_images[i][p];
-            score_(a,3)+= W_(3,p)*train_images[i][p];
-            score_(a,4)+= W_(4,p)*train_images[i][p];
-            score_(a,5)+= W_(5,p)*train_images[i][p];
-            score_(a,6)+= W_(6,p)*train_images[i][p];
-            score_(a,7)+= W_(7,p)*train_images[i][p];
-            score_(a,8)+= W_(8,p)*train_images[i][p];
-            score_(a,9)+= W_(9,p)*train_images[i][p];
-
-
-        }
-    }
-
-
-}
 void svm::SVMiterate(int iter, int batch){
 
       progressBar->setValue(0);
   int number_of_full_batches= train_images.size()/batch;
 
-
-
    int last_batch= train_images.size()-number_of_full_batches*batch;
 
     for(int i=0; i<iter;i++){
+
          itResult->setText(QString::number(i+1) +"/"+QString::number(iter) );
          progressBar->setValue(0);  
         for(int j=0;j<number_of_full_batches;j++){    
@@ -422,9 +237,8 @@ void svm::SVMiterate(int iter, int batch){
 
              int from=j*batch;
              int until=j*batch+batch-1;    
-            calculateScores( from,  until, batch);
-            SVMtraining( from,  until);
-            updateWeights();
+            Loss_=loss(train_images, train_labels,  from, until);
+
             lossResult->setText(QString::number(Loss_));
     vizWeights();
         } 
@@ -441,83 +255,12 @@ void svm::resetWeights(){
 //init weight and scores matrices
    initRandomWeights();
     vizWeights();
-    int result = inference(currentIndex_);
+    int result = inference(test_images[currentIndex_]);
     lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 
 }
-void svm::updateWeights(){
- for(int x=0; x<dW_.xSize();x++){
-     for(int y=0; y<dW_.ySize();y++){
-                   if(stop_){return;}
-        W_(x,y)-= step_*dW_(x,y);
-       //  std::cout<<"dW["<<x<<"]["<<y<<"]="<<dW_(x,y)<<"  W["<<x<<"]["<<y<<"]="<<W_(x,y)<<"\n";
-        }
-    }
-}
-//SVM training function
-void svm::SVMtraining(int from, int until){
-
-    dW_.fill(0); //reset grad update matrix
-    loss_.clear(); //compute loss for each image
-    int N=until-from;
-    for(int i=from; i<until; i++){
-          QCoreApplication::processEvents();
-           if(stop_){return;}
-          int a=i-from;
-          float y=score_(a,train_labels[i]);//right score
-          std::vector<float> SVMloss(10,0);
-          //for grad update compute how many times loss more than 0
-          int counter=0; 
-          
-        for(int j=0;j<score_.ySize();j++){                
-
-                if(train_labels[i]!=j){
-                     SVMloss[j]=std::max(0.0, score_(a,j)-y +1.0) ;                             
-                     counter+=( SVMloss[j]>0);
-            }                       
-          }
-            for(int dx=0; dx<dW_.xSize();dx++){
-                for(int dy=0; dy<dW_.ySize();dy++){
-            
-                    
-                 if(train_labels[i]==dx){ //if this is correct label row of weights
-            
-                    dW_(dx,dy)+=-1*counter*train_images[i][dy]; //+lambda_*W_(dx,dy) ;//second term is regularizer             
-                }else if(train_labels[i]!=dx){    
-                    dW_(dx,dy)+= (SVMloss[dx]>0) *train_images[i][dy];// +lambda_*W_(dx,dy);                  
-                }                  
-            }
-        }
 
 
-
-
-
-           loss_.push_back(std::accumulate(SVMloss.begin(), SVMloss.end(), 0.0));
-    }
-
-    //add regularization to the gradient weights and normalize them 
-
- for(int dx=0; dx<dW_.xSize();dx++){
-                for(int dy=0; dy<dW_.ySize();dy++){
-            dW_(dx,dy)=dW_(dx,dy)/N +lambda_*W_(dx,dy);
-        }
-    }
-
-   float Loss = std::accumulate(loss_.begin(), loss_.end(), 0.0);
-   float regularization=0;
-        for(int y=0;y<W_.ySize();y++){
-            for(int x=0;x<W_.xSize();x++){
-               regularization+= W_(x,y)*W_(x,y);
-            }           
-        }
-
-        regularization=0.5*lambda_*regularization;
-        Loss_=Loss/ loss_.size()+ regularization;
-    
-
-
-}
 
 void svm::initRandomWeights(){
   W_.setSize(categories.size(),train_images[0].size()); //weight matrix
@@ -585,7 +328,7 @@ void svm::init(){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-    int result = inference(currentIndex_);
+    int result = inference(test_images[currentIndex_]);
   
     lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
@@ -613,33 +356,12 @@ void svm::updateImage(){
    labelPicture->show();
    lineEdit->setText(QString::fromUtf8(categories[test_labels[index]].c_str()));
 
-    int result = inference(index);
+    int result = inference(test_images[index]);
    
 
     lineEdit_2->setText(QString::fromUtf8(categories[result].c_str()));
 }
-int svm::inference(int test_picture_index){
 
-  std::vector<float> score(10,0);  
-
-        for(int p=0;p<test_images[test_picture_index].size();p++){
-                
-            score[0]+= W_(0,p)*test_images[test_picture_index][p];
-            score[1]+= W_(1,p)*test_images[test_picture_index][p];
-            score[2]+= W_(2,p)*test_images[test_picture_index][p];
-            score[3]+= W_(3,p)*test_images[test_picture_index][p];
-            score[4]+= W_(4,p)*test_images[test_picture_index][p];
-            score[5]+= W_(5,p)*test_images[test_picture_index][p];
-            score[6]+= W_(6,p)*test_images[test_picture_index][p];
-            score[7]+= W_(7,p)*test_images[test_picture_index][p];
-            score[8]+= W_(8,p)*test_images[test_picture_index][p];
-            score[9]+= W_(9,p)*test_images[test_picture_index][p];
-
-
-        }
-
- return  std::max_element(score.begin(), score.end())- score.begin();
-}
 
 void svm::calculatePerformance(){
 
@@ -647,7 +369,7 @@ void svm::calculatePerformance(){
  for(int i=0; i<test_labels.size();i++){
 
 
-          int prediction=inference(i);
+          int prediction=inference(test_images[i]);
 
         acc+= prediction == test_labels[i];
     }
@@ -786,4 +508,105 @@ void svm::open(){
        } 
 
 
+}
+
+//all svm functions
+
+float svm::L2W_reg(){
+    float sum = 0;
+    for (int x = 0; x < W_.xSize(); ++x)
+        for (int y = 0; y < W_.ySize(); ++y){
+            sum += W_(x,y) * W_(x,y);
+        }
+    return sum;
+}
+
+float svm::loss_one_image(const std::vector<int> &image, const int &y){
+
+   // assert(image.size() == 3073);
+
+    std::vector<float> scores(10, 0);
+
+    // Compute scores
+    // scores = W*x
+    for(int c=0; c<C; ++c){
+        for(int d=0; d<D; ++d){
+            scores[c] += W_(c,d)*image[d];
+        }
+    }
+
+    // Compute loss
+    float loss = 0;
+    int counter = 0;
+    std::vector<float> margins(10,0);
+    for (int j=0; j<C; ++j)
+    {
+        if(j==y) continue;
+        margins[j] = std::max(0.f, scores[j] - scores[y] + 1);
+        counter += (margins[j]>0);
+        loss += margins[j];
+
+    }
+
+    // Compute gradient
+    for (int j=0; j<C; ++j)
+        for (int d=0; d<D; ++d){
+            if(j==y){
+                dW_(j,d) += -image[d]*counter;
+            } else if(j!=y) {
+                dW_(j,d) += (margins[j]>0)*image[d];
+            }
+        }
+
+
+    return loss;
+}
+
+float svm::loss(const std::vector< std::vector<int> > &images, const std::vector<int> &labels, int from, int to)
+{
+    assert(images.size() == 50000); //only training set
+
+    // Reset gradient
+    dW_.fill(0.0);
+
+    // Compute loss for all images
+    float L = 0;
+    int N = to-from; // N images in batch
+    for(int i=from; i<to; ++i){
+        L += loss_one_image(images[i], labels[i]);
+    }
+    L /= N;
+    L += 0.5 * lambda_ * L2W_reg();
+    std::cout << "Loss: " << L << std::endl;
+
+    // Normalize and regularize gradient
+    for (int x=0; x< dW_.xSize(); ++x){
+        for (int y=0; y < dW_.ySize(); ++y){
+            dW_(x,y) = dW_(x,y)/static_cast<float>(N) + lambda_*W_(x,y);
+        }
+    }
+
+    // Update weights
+    for (int x=0; x<W_.xSize(); ++x){
+        for (int y=0; y<W_.ySize(); ++y){
+            W_(x, y) += -step_*dW_(x, y);
+        }
+    }
+
+    return L;
+}
+
+
+int svm::inference(const std::vector<int> &image){
+
+    std::vector<float> scores(10, 0);
+
+    // scores = W*x
+    for(int c=0; c < C; ++c){
+        for(int d=0; d < D; ++d){
+            scores[c] += W_(c,d)*image[d];
+        }
+    }
+
+    return std::max_element(scores.begin(), scores.end()) - scores.begin();
 }

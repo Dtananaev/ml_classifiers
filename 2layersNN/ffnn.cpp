@@ -41,7 +41,7 @@ ffnn::ffnn(QWidget *parent):  QMainWindow(parent){
  connect(lambdaBox, SIGNAL(valueChanged(double)), this, SLOT(updateLambda()));
  connect(itBox, SIGNAL(valueChanged(int)), this, SLOT(updatIterationNumber()));
  connect(batchBox, SIGNAL(valueChanged(int)), this, SLOT(updatBatchNumber()));
-
+ connect(neuronBox, SIGNAL(valueChanged(int)), this, SLOT(updatNeuronNumber()));
        batchBox->setValue(100);
        stepBox->setRange(0.00000000000001, 99);
        stepBox->setValue(0.00000000000001);
@@ -75,7 +75,8 @@ void ffnn::weight2image(CMatrix<float> w, int label, QImage &img){
 
 void ffnn::vizWeights(){
 
-   //create 10 image for weights
+
+      //create 10 image for weights
  QImage img0(32, 32, QImage::Format_RGB888);
  QImage img1(32, 32, QImage::Format_RGB888);
  QImage img2(32, 32, QImage::Format_RGB888);
@@ -89,6 +90,9 @@ void ffnn::vizWeights(){
 
 CMatrix<float> w=W1_;
     w.normalize(0,255);
+
+   if(W1_.xSize()>=10){
+
    weight2image(w,0, img0);
    weight2image(w,1, img1); 
    weight2image(w,2, img2); 
@@ -99,61 +103,230 @@ CMatrix<float> w=W1_;
    weight2image(w,7, img7);
    weight2image(w,8, img8);
    weight2image(w,9, img9);
-
    img0=img0.scaledToWidth(airplaneLbl1->width(), Qt::SmoothTransformation);
    airplaneLbl1->setPixmap(QPixmap::fromImage(img0));
    airplaneLbl1->show();
-
-
    img1=img1.scaledToWidth(automobilLbl2->width(), Qt::SmoothTransformation);
    automobilLbl2->setPixmap(QPixmap::fromImage(img1));
    automobilLbl2->show();
-
    img2=img2.scaledToWidth(birdLbl3->width(), Qt::SmoothTransformation);
    birdLbl3->setPixmap(QPixmap::fromImage(img2));
    birdLbl3->show();
-
-   img2=img2.scaledToWidth(birdLbl3->width(), Qt::SmoothTransformation);
-   birdLbl3->setPixmap(QPixmap::fromImage(img2));
-   birdLbl3->show();
-
    img3=img3.scaledToWidth(catLbl4->width(), Qt::SmoothTransformation);
    catLbl4->setPixmap(QPixmap::fromImage(img3));
    catLbl4->show();
-
    img4=img4.scaledToWidth(deerLbl5->width(), Qt::SmoothTransformation);
    deerLbl5->setPixmap(QPixmap::fromImage(img4));
    deerLbl5->show();
-
    img5=img5.scaledToWidth(dogLbl6->width(), Qt::SmoothTransformation);
    dogLbl6->setPixmap(QPixmap::fromImage(img5));
    dogLbl6->show();
-
    img6=img6.scaledToWidth(frogLbl7->width(), Qt::SmoothTransformation);
    frogLbl7->setPixmap(QPixmap::fromImage(img6));
    frogLbl7->show();
-
-
    img7=img7.scaledToWidth(horseLbl8->width(), Qt::SmoothTransformation);
    horseLbl8->setPixmap(QPixmap::fromImage(img7));
    horseLbl8->show();
-
    img8=img8.scaledToWidth(shipLbl9->width(), Qt::SmoothTransformation);
    shipLbl9->setPixmap(QPixmap::fromImage(img8));
    shipLbl9->show();
-
-
    img9=img9.scaledToWidth(truckLbl10->width(), Qt::SmoothTransformation);
    truckLbl10->setPixmap(QPixmap::fromImage(img9));
    truckLbl10->show();
+   } 
 
+     if( W1_.xSize()>=20){
+      //create 10 image for weights
+ QImage img01(32, 32, QImage::Format_RGB888);
+ QImage img11(32, 32, QImage::Format_RGB888);
+ QImage img21(32, 32, QImage::Format_RGB888);
+ QImage img31(32, 32, QImage::Format_RGB888);
+ QImage img41(32, 32, QImage::Format_RGB888);
+ QImage img51(32, 32, QImage::Format_RGB888);
+ QImage img61(32, 32, QImage::Format_RGB888);
+ QImage img71(32, 32, QImage::Format_RGB888);
+ QImage img81(32, 32, QImage::Format_RGB888);
+ QImage img91(32, 32, QImage::Format_RGB888);
+   weight2image(w,10, img01);
+   weight2image(w,11, img11); 
+   weight2image(w,12, img21); 
+   weight2image(w,13, img31);
+   weight2image(w,14, img41);
+   weight2image(w,15, img51);
+   weight2image(w,16, img61);
+   weight2image(w,17, img71);
+   weight2image(w,18, img81);
+   weight2image(w,19, img91);
+       img01=img01.scaledToWidth(airplaneLbl1_2->width(), Qt::SmoothTransformation);
+   airplaneLbl1_2->setPixmap(QPixmap::fromImage(img01));
+   airplaneLbl1_2->show();
+   img11=img11.scaledToWidth(automobilLbl2_2->width(), Qt::SmoothTransformation);
+   automobilLbl2_2->setPixmap(QPixmap::fromImage(img11));
+   automobilLbl2_2->show();
+   img21=img21.scaledToWidth(birdLbl3_2->width(), Qt::SmoothTransformation);
+   birdLbl3_2->setPixmap(QPixmap::fromImage(img21));
+   birdLbl3_2->show();
+   img31=img31.scaledToWidth(catLbl4_2->width(), Qt::SmoothTransformation);
+   catLbl4_2->setPixmap(QPixmap::fromImage(img31));
+   catLbl4_2->show();
+   img41=img41.scaledToWidth(deerLbl5_2->width(), Qt::SmoothTransformation);
+   deerLbl5_2->setPixmap(QPixmap::fromImage(img41));
+   deerLbl5_2->show();
+   img51=img51.scaledToWidth(dogLbl6_2->width(), Qt::SmoothTransformation);
+   dogLbl6_2->setPixmap(QPixmap::fromImage(img51));
+   dogLbl6_2->show();
+   img61=img61.scaledToWidth(frogLbl7_2->width(), Qt::SmoothTransformation);
+   frogLbl7_2->setPixmap(QPixmap::fromImage(img61));
+   frogLbl7_2->show();
+   img71=img71.scaledToWidth(horseLbl8_2->width(), Qt::SmoothTransformation);
+   horseLbl8_2->setPixmap(QPixmap::fromImage(img71));
+   horseLbl8_2->show();
+   img81=img81.scaledToWidth(shipLbl9_2->width(), Qt::SmoothTransformation);
+   shipLbl9_2->setPixmap(QPixmap::fromImage(img81));
+   shipLbl9_2->show();
+   img91=img91.scaledToWidth(truckLbl10_2->width(), Qt::SmoothTransformation);
+   truckLbl10_2->setPixmap(QPixmap::fromImage(img91));
+   truckLbl10_2->show();
+    }
+     if(W1_.xSize()>=30){
+  weight2image(w,20, img0);
+   weight2image(w,21, img1); 
+   weight2image(w,22, img2); 
+   weight2image(w,23, img3);
+   weight2image(w,24, img4);
+   weight2image(w,25, img5);
+   weight2image(w,26, img6);
+   weight2image(w,27, img7);
+   weight2image(w,28, img8);
+   weight2image(w,29, img9);
+       img0=img0.scaledToWidth(airplaneLbl1_3->width(), Qt::SmoothTransformation);
+   airplaneLbl1_3->setPixmap(QPixmap::fromImage(img0));
+   airplaneLbl1_3->show();
+   img1=img1.scaledToWidth(automobilLbl2_3->width(), Qt::SmoothTransformation);
+   automobilLbl2_3->setPixmap(QPixmap::fromImage(img1));
+   automobilLbl2_3->show();
+   img2=img2.scaledToWidth(birdLbl3_3->width(), Qt::SmoothTransformation);
+   birdLbl3_3->setPixmap(QPixmap::fromImage(img2));
+   birdLbl3_3->show();
+   img3=img3.scaledToWidth(catLbl4_3->width(), Qt::SmoothTransformation);
+   catLbl4_3->setPixmap(QPixmap::fromImage(img3));
+   catLbl4_3->show();
+   img4=img4.scaledToWidth(deerLbl5_3->width(), Qt::SmoothTransformation);
+   deerLbl5_3->setPixmap(QPixmap::fromImage(img4));
+   deerLbl5_3->show();
+   img5=img5.scaledToWidth(dogLbl6_3->width(), Qt::SmoothTransformation);
+   dogLbl6_3->setPixmap(QPixmap::fromImage(img5));
+   dogLbl6_3->show();
+   img6=img6.scaledToWidth(frogLbl7_3->width(), Qt::SmoothTransformation);
+   frogLbl7_3->setPixmap(QPixmap::fromImage(img6));
+   frogLbl7_3->show();
+   img7=img7.scaledToWidth(horseLbl8_3->width(), Qt::SmoothTransformation);
+   horseLbl8_3->setPixmap(QPixmap::fromImage(img7));
+   horseLbl8_3->show();
+   img8=img8.scaledToWidth(shipLbl9_3->width(), Qt::SmoothTransformation);
+   shipLbl9_3->setPixmap(QPixmap::fromImage(img8));
+   shipLbl9_3->show();
+   img9=img9.scaledToWidth(truckLbl10_3->width(), Qt::SmoothTransformation);
+   truckLbl10_3->setPixmap(QPixmap::fromImage(img9));
+   truckLbl10_3->show();
+
+    }
+     if(W1_.xSize()>=40){
+  weight2image(w,30, img0);
+   weight2image(w,31, img1); 
+   weight2image(w,32, img2); 
+   weight2image(w,33, img3);
+   weight2image(w,34, img4);
+   weight2image(w,35, img5);
+   weight2image(w,36, img6);
+   weight2image(w,37, img7);
+   weight2image(w,38, img8);
+   weight2image(w,39, img9);
+       img0=img0.scaledToWidth(airplaneLbl1_4->width(), Qt::SmoothTransformation);
+   airplaneLbl1_4->setPixmap(QPixmap::fromImage(img0));
+   airplaneLbl1_4->show();
+   img1=img1.scaledToWidth(automobilLbl2_4->width(), Qt::SmoothTransformation);
+   automobilLbl2_4->setPixmap(QPixmap::fromImage(img1));
+   automobilLbl2_4->show();
+   img2=img2.scaledToWidth(birdLbl3_4->width(), Qt::SmoothTransformation);
+   birdLbl3_4->setPixmap(QPixmap::fromImage(img2));
+   birdLbl3_4->show();
+   img3=img3.scaledToWidth(catLbl4_4->width(), Qt::SmoothTransformation);
+   catLbl4_4->setPixmap(QPixmap::fromImage(img3));
+   catLbl4_4->show();
+   img4=img4.scaledToWidth(deerLbl5_4->width(), Qt::SmoothTransformation);
+   deerLbl5_4->setPixmap(QPixmap::fromImage(img4));
+   deerLbl5_4->show();
+   img5=img5.scaledToWidth(dogLbl6_4->width(), Qt::SmoothTransformation);
+   dogLbl6_4->setPixmap(QPixmap::fromImage(img5));
+   dogLbl6_4->show();
+   img6=img6.scaledToWidth(frogLbl7_4->width(), Qt::SmoothTransformation);
+   frogLbl7_4->setPixmap(QPixmap::fromImage(img6));
+   frogLbl7_4->show();
+   img7=img7.scaledToWidth(horseLbl8_4->width(), Qt::SmoothTransformation);
+   horseLbl8_4->setPixmap(QPixmap::fromImage(img7));
+   horseLbl8_4->show();
+   img8=img8.scaledToWidth(shipLbl9_4->width(), Qt::SmoothTransformation);
+   shipLbl9_4->setPixmap(QPixmap::fromImage(img8));
+   shipLbl9_4->show();
+   img9=img9.scaledToWidth(truckLbl10_4->width(), Qt::SmoothTransformation);
+   truckLbl10_4->setPixmap(QPixmap::fromImage(img9));
+   truckLbl10_4->show();
+
+    }
+
+     if(W1_.xSize()==50){
+  weight2image(w,40, img0);
+   weight2image(w,41, img1); 
+   weight2image(w,42, img2); 
+   weight2image(w,43, img3);
+   weight2image(w,44, img4);
+   weight2image(w,45, img5);
+   weight2image(w,46, img6);
+   weight2image(w,47, img7);
+   weight2image(w,48, img8);
+   weight2image(w,49, img9);
+       img0=img0.scaledToWidth(airplaneLbl1_5->width(), Qt::SmoothTransformation);
+   airplaneLbl1_5->setPixmap(QPixmap::fromImage(img0));
+   airplaneLbl1_5->show();
+   img1=img1.scaledToWidth(automobilLbl2_5->width(), Qt::SmoothTransformation);
+   automobilLbl2_5->setPixmap(QPixmap::fromImage(img1));
+   automobilLbl2_5->show();
+   img2=img2.scaledToWidth(birdLbl3_5->width(), Qt::SmoothTransformation);
+   birdLbl3_5->setPixmap(QPixmap::fromImage(img2));
+   birdLbl3_5->show();
+   img3=img3.scaledToWidth(catLbl4_5->width(), Qt::SmoothTransformation);
+   catLbl4_5->setPixmap(QPixmap::fromImage(img3));
+   catLbl4_5->show();
+   img4=img4.scaledToWidth(deerLbl5_5->width(), Qt::SmoothTransformation);
+   deerLbl5_5->setPixmap(QPixmap::fromImage(img4));
+   deerLbl5_5->show();
+   img5=img5.scaledToWidth(dogLbl6_5->width(), Qt::SmoothTransformation);
+   dogLbl6_5->setPixmap(QPixmap::fromImage(img5));
+   dogLbl6_5->show();
+   img6=img6.scaledToWidth(frogLbl7_5->width(), Qt::SmoothTransformation);
+   frogLbl7_5->setPixmap(QPixmap::fromImage(img6));
+   frogLbl7_5->show();
+   img7=img7.scaledToWidth(horseLbl8_5->width(), Qt::SmoothTransformation);
+   horseLbl8_5->setPixmap(QPixmap::fromImage(img7));
+   horseLbl8_5->show();
+   img8=img8.scaledToWidth(shipLbl9_5->width(), Qt::SmoothTransformation);
+   shipLbl9_5->setPixmap(QPixmap::fromImage(img8));
+   shipLbl9_5->show();
+   img9=img9.scaledToWidth(truckLbl10_5->width(), Qt::SmoothTransformation);
+   truckLbl10_5->setPixmap(QPixmap::fromImage(img9));
+   truckLbl10_5->show();
+    }
 
 }
 
 void ffnn::updatIterationNumber(){
     iteration_=itBox->value();
 }
+void ffnn::updatNeuronNumber(){
+    L1_neurons_ = neuronBox->value();
 
+}
 void ffnn::updatBatchNumber(){
     batch_size_=batchBox->value();
 }
@@ -198,10 +371,10 @@ void ffnn::iterate(int iter, int batch){
              softmaxLoss(score2,relu,  from,  until);
              updateWeights();
             lossResult->setText(QString::number(Loss_));
-    vizWeights();
+
         } 
     
-
+    vizWeights();
     calculatePerformance();
     }
 
@@ -211,6 +384,9 @@ void ffnn::iterate(int iter, int batch){
 
 void ffnn::runTraining(){
     stop_=false;
+
+    dW1_.setSize( L1_neurons_,train_images[0].size()); //gradient update matrix
+    dW2_.setSize(L2_neurons_,L1_neurons_+1);
 /*
     int from = 0; 
     int until =1000;
@@ -478,45 +654,39 @@ float scale2=0;
         weight+=W1_(x,y)*W1_(x,y);
          dw+= step_*dW1_(x,y)*step_*dW1_(x,y); 
        W1_(x,y)-= step_*dW1_(x,y);
-       //  std::cout<<"dW1["<<x<<"]["<<y<<"]="<<dW1_(x,y)<<"  W1["<<x<<"]["<<y<<"]="<<W1_(x,y)<<"\n";
- 
+     
         }
     
     }
-      // std::cin.get();
+
 
     float a=sqrt(dw)/sqrt(weight);
             weightRelation->setText(QString::number(a));
  for(int x=0; x<dW2_.xSize();x++){
-      // weight=0;
-       //dw=0;
+       weight=0;
+       dw=0;
      for(int y=0; y<dW2_.ySize();y++){
                    if(stop_){return;}
         //calculate the scale of weights and weight update
-      //  weight+=W2_(x,y)*W2_(x,y);
-        // dw+= step_*dW1_(x,y)*step_*dW1_(x,y); 
+        weight+=W2_(x,y)*W2_(x,y);
+         dw+= step_*dW2_(x,y)*step_*dW2_(x,y); 
        W2_(x,y)-= step_*dW2_(x,y);
-       // std::cout<<"dW2["<<x<<"]["<<y<<"]="<<dW2_(x,y)<<"  W2["<<x<<"]["<<y<<"]="<<W2_(x,y)<<"\n";
- 
+
         }
-       // scale1
+
     
     }
-    //  std::cin.get();
-
+     a=sqrt(dw)/sqrt(weight);
+            weightRelation2->setText(QString::number(a));
 }
 
 
 
 void ffnn::initRandomWeights(){
 //Layer 1 weights
-  //weight matrix for the first layer size:  L1_neurons_ x 32x32x3 +1 
-  //should be  30x3073 if L1_neurons_=30
      W1_.setSize( L1_neurons_,train_images[0].size());
 //Layer 2 weights
-  //weight matrix for the second layer size:  L2_neurons_ x L1_neurons_ +1 
-  //should be  10x31 if L1_neurons_=30
-     W2_.setSize( L2_neurons_,L1_neurons_+1);//weight matrix
+     W2_.setSize( L2_neurons_,L1_neurons_+1);
 
 
  std::default_random_engine generator;
@@ -545,7 +715,7 @@ void ffnn::initRandomWeights(){
 void ffnn::init(){
 //number 
 
-   L1_neurons_ = 70;//number of neurons in hidden layer
+   L1_neurons_ = 50;//number of neurons in hidden layer
    L2_neurons_ = 10; //number of outputs should be 10 for CIFAR 10
 
 
@@ -761,7 +931,6 @@ test_images.clear();
 
 void ffnn::open(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-
     if( trainSetread(folder_path.toUtf8().constData())&& testSetread(folder_path.toUtf8().constData())){      
             init();
        } 
@@ -779,8 +948,6 @@ void ffnn::calculateScoresLayer1(int from, int until, CMatrix<float>  &result){
 
   //init score matrix
     result.fill(0);
-    //CMatrix<float> result(batch, W1_.xSize(),0);
-
     //for each image in batch compute the cost:
     for(int i=from; i<until; i++){
             int a=i-from; 
@@ -789,21 +956,13 @@ void ffnn::calculateScoresLayer1(int from, int until, CMatrix<float>  &result){
             for (int u=0; u<W1_.xSize();u++){            
                 result(a,u)+= W1_(u,p)*train_images[index_[i]][p];
 
-            }
-
-         
+            }         
         }
-//for (int u=0; u<W1_.xSize();u++){            
-              //    std::cout<<"score1 "<< result(a,u)<<"\n";
-             //   std::cin.get(); 
-   //         }
                     
     }
- // return result;
 }
 void ffnn::ReLU(CMatrix<float> scores, CMatrix<float> &result){
 
-  //CMatrix<float> result(scores.xSize(),scores.ySize()+1);
 result.fill(0);
     for(int x=0;x<scores.xSize();x++){//batch
         for(int y=0;y<scores.ySize();y++){//scores
@@ -812,8 +971,6 @@ result.fill(0);
         }
         result(x,scores.ySize())=1;//add bias
     }
-
-  //  return result;
 }
 
 void ffnn::calculateScoresLayer2(CMatrix<float> data, CMatrix<float> &result){
@@ -837,18 +994,11 @@ void ffnn::calculateScoresLayer2(CMatrix<float> data, CMatrix<float> &result){
             float normalizer=0;
               for (int u=0; u<W2_.xSize(); u++){            
             result(i,u) = exp(result(i,u)- max_score);
-
-
               normalizer+=result(i,u);
             }
-
-
             normalizer_.push_back(normalizer);  
 
-
     }
-
-    //return result;
 
 }
 
@@ -871,8 +1021,8 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
 
 
     CMatrix<float> d2_propagate(dW2_.xSize(),dW2_.ySize(),0);
-        //update weights for the layer 2
-
+        
+    //update weights for the layer 2
          for(int dx=0; dx<dW2_.xSize();dx++){//10
                 for(int dy=0; dy<dW2_.ySize();dy++){//31
                                
@@ -885,29 +1035,23 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
                      dW2_(dx,dy)+= relu(a,dy)*scores(a,dx)/N + lambda_*W2_(dx,dy); 
                      d2_propagate(dx,dy)= scores(a,dx)/normalizer_[a];             
                 }
-          //             std::cout<<"dW2["<<dx<<"]["<<dy<<"]="<<dW2_(dx,dy)<<"\n";
-          //  std::cin.get();                  
+                  
             }
 
      }
 
-     //backward propagation of the dW2_  for each image until layer 1
+  //backward propagation of the dW2_  for each image separately  (not sum/N!!!) until layer 1
 
      //gradient before ReLU   
     std::vector<float> grad(dW2_.ySize()-1,0);
      for(int dy=0; dy<dW2_.ySize()-1;dy++){//31
-                      //  std::cout<<"dy "<<dy<<"\n";
-                      //  std::cout<<"dx "<<dW2_.xSize()<<"\n";
+
             float result=0;
             //gradient before ReLU   
             for(int dx=0; dx<dW2_.xSize();dx++){//10
-                       //result+=  d2_propagate(dx,dy); 
-
-                        result+=  d2_propagate(dx,dy)*W2_(dx,dy); 
-
+                   result+=  d2_propagate(dx,dy)*W2_(dx,dy); 
                 }
-               // std::cout<<"result "<<result<<"\n";
-               // std::cin.get();
+
              //gradient afrer ReLU 
                if(relu(a,dy)>0){ 
                     grad[dy]=result;
@@ -917,16 +1061,11 @@ void ffnn::softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int 
   
    //update weights for the layer 1
          for(int dx=0; dx<dW1_.xSize();dx++){//30
-                for(int dy=0; dy<dW1_.ySize();dy++){//3073                                           
-                         
-                dW1_(dx,dy)+=train_images[index_[i]][dy]*grad[dx]/N +lambda_*W1_(dx,dy);
-           //                                std::cout<<"dW1["<<dx<<"]["<<dy<<"]="<<dW1_(dx,dy)<<"\n";
-           // std::cin.get();
+                for(int dy=0; dy<dW1_.ySize();dy++){//3073                                               
+                dW1_(dx,dy)+=train_images[index_[i]][dy]*grad[dx]/N +lambda_*W1_(dx,dy);          
             }
- 
      }  
         
-
 }
 
 

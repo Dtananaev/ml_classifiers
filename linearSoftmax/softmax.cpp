@@ -557,7 +557,7 @@ void softmax::SoftmaxTraining(int from, int until){
 
     dW_.fill(0); //reset grad update matrix
     loss_.clear(); //compute loss for each image
-
+    int N=until-from;
     for(int i=from; i<until; i++){
           QCoreApplication::processEvents();
            if(stop_){return;}
@@ -573,10 +573,10 @@ void softmax::SoftmaxTraining(int from, int until){
                                
                  if(train_labels[index_[i]]==dx){ //if this is correct label row of weights
                           
-                dW_(dx,dy)+=train_images[index_[i]][dy]*(softmax-1)+lambda_*W_(dx,dy);
+                dW_(dx,dy)+=train_images[index_[i]][dy]*(softmax-1);
                          
                 }else if(train_labels[index_[i]]!=dx){    
-                    dW_(dx,dy)+= train_images[index_[i]][dy]*score_(a,dx)/normalizer_[a] +lambda_*W_(dx,dy);                  
+                    dW_(dx,dy)+= train_images[index_[i]][dy]*score_(a,dx)/normalizer_[a];                  
                 }                  
             }
         }
@@ -586,6 +586,13 @@ void softmax::SoftmaxTraining(int from, int until){
 
    float Loss = std::accumulate(loss_.begin(), loss_.end(), 0.0);
 
+//dweight regularization
+ for(int dx=0; dx<dW_.xSize();dx++){
+                for(int dy=0; dy<dW_.ySize();dy++){
+
+    dW_(dx,dy)=dW_(dx,dy)/N +lambda_* W_(dx,dy);    
+     }
+    }
    float regularization=0;
         for(int y=0;y<W_.ySize();y++){
             for(int x=0;x<W_.xSize();x++){
@@ -649,8 +656,7 @@ for(int i=0;i<50000;i++){
  //init weight and scores matrices
    initRandomWeights();
     vizWeights();
-//W_.setSize(categories.size(),train_images[0].size()); //weight matrix
-//W_.fill(0.00001); //weight matrix
+
     dW_.setSize(categories.size(),train_images[0].size()); //gradient update matrix
     
 
