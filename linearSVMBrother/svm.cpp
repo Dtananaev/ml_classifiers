@@ -281,6 +281,8 @@ void svm::initRandomWeights(){
 }
 
 void svm::init(){
+  C=10;
+     D=3073; // data dimentionality
 
   //fill the cathegory names
   categories.push_back("airplane");
@@ -294,8 +296,9 @@ void svm::init(){
   categories.push_back("ship");
   categories.push_back("truck");
 
-
+std::cout<<"1"<<"\n";
 //SVM init!!!
+    int 
     iteration_=1;
     batch_size_=100;
     lambda_=0.5;
@@ -305,7 +308,7 @@ void svm::init(){
     vizWeights();
     dW_.setSize(categories.size(),train_images[0].size()); //gradient update matrix
     
-
+std::cout<<"2"<<"\n";
 
 
 
@@ -532,8 +535,12 @@ float svm::loss_one_image(const std::vector<int> &image, const int &y){
     for(int c=0; c<C; ++c){
         for(int d=0; d<D; ++d){
             scores[c] += W_(c,d)*image[d];
-        }
+   //  std::cout<<"score "<<scores[c]<<"\n";
+     //   std::cin.get();        
     }
+           
+        }
+
 
     // Compute loss
     float loss = 0;
