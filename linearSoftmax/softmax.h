@@ -81,7 +81,7 @@ private:
     int currentIndex_;
     float lambda_; //regularization parameter
     float step_;
-
+      CMatrix<float> W_test_;  
       CMatrix<float> W_;//weight matrix
       CMatrix<float> dW_;//gradient weight matrix
       CMatrix<float> score_;  //cost matrix   

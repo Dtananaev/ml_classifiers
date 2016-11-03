@@ -44,9 +44,9 @@ softmax::softmax(QWidget *parent):  QMainWindow(parent){
  connect(batchBox, SIGNAL(valueChanged(int)), this, SLOT(updatBatchNumber()));
 
        batchBox->setValue(100);
-       stepBox->setRange(0.00000000000001, 1);
-       stepBox->setValue(0.00000000000001);
-       stepBox->setSingleStep(0.00000000000001);
+       stepBox->setRange(0.00000000000001, 10);
+       stepBox->setValue(0.0000001);
+       stepBox->setSingleStep(0.0000001);
        lambdaBox->setValue(0.5);
 }
 
@@ -88,7 +88,8 @@ void softmax::vizWeights(){
  QImage img8(32, 32, QImage::Format_RGB888);
  QImage img9(32, 32, QImage::Format_RGB888);
 
-CMatrix<float> w=W_;
+//CMatrix<float> w=W_;
+CMatrix<float> w=W_test_;
     w.normalize(0,255);
    weight2image(w,0, img0);
    weight2image(w,1, img1); 
@@ -543,6 +544,8 @@ float dmax=0;
         weight+=W_(x,y)*W_(x,y);
          dw+= step_*dW_(x,y)*step_*dW_(x,y); 
         W_(x,y)-= step_*dW_(x,y);
+        W_test_(x,y)=0.995*W_test_(x,y)+0.005*W_(x,y);
+    
             if(W_(x,y)>max){ max=W_(x,y);}
             if(W_(x,y)<min){ min=W_(x,y);}
 
@@ -622,7 +625,8 @@ void softmax::SoftmaxTraining(int from, int until){
 
 void softmax::initRandomWeights(){
   W_.setSize(categories.size(),train_images[0].size()); //weight matrix
-
+    W_test_.setSize(categories.size(),train_images[0].size());
+    W_test_.fill(0);
  std::default_random_engine generator;
   std::normal_distribution<double> distribution(0,0.00001);
 
@@ -641,6 +645,8 @@ void softmax::initRandomWeights(){
 }
 
 void softmax::init(){
+
+    
 //add indices from 0 to 49 999 to the index_ vector for random batch sampling
 for(int i=0;i<50000;i++){
     index_.push_back(i);
@@ -663,7 +669,7 @@ for(int i=0;i<50000;i++){
     iteration_=1;
     batch_size_=100;
     lambda_=0.5;
-    step_=0.00000000001;
+    step_=0.0000001;
  //init weight and scores matrices
    initRandomWeights();
     vizWeights();
@@ -731,7 +737,7 @@ int softmax::inference(int test_picture_index){
   std::vector<float> score(10,0);  
 
         for(int p=0;p<test_images[test_picture_index].size();p++){
-                
+        /*
             score[0]+= W_(0,p)*test_images[test_picture_index][p];
             score[1]+= W_(1,p)*test_images[test_picture_index][p];
             score[2]+= W_(2,p)*test_images[test_picture_index][p];
@@ -742,7 +748,17 @@ int softmax::inference(int test_picture_index){
             score[7]+= W_(7,p)*test_images[test_picture_index][p];
             score[8]+= W_(8,p)*test_images[test_picture_index][p];
             score[9]+= W_(9,p)*test_images[test_picture_index][p];
-
+        */
+            score[0]+= W_test_(0,p)*test_images[test_picture_index][p];
+            score[1]+= W_test_(1,p)*test_images[test_picture_index][p];
+            score[2]+= W_test_(2,p)*test_images[test_picture_index][p];
+            score[3]+= W_test_(3,p)*test_images[test_picture_index][p];
+            score[4]+= W_test_(4,p)*test_images[test_picture_index][p];
+            score[5]+= W_test_(5,p)*test_images[test_picture_index][p];
+            score[6]+= W_test_(6,p)*test_images[test_picture_index][p];
+            score[7]+= W_test_(7,p)*test_images[test_picture_index][p];
+            score[8]+= W_test_(8,p)*test_images[test_picture_index][p];
+            score[9]+= W_test_(9,p)*test_images[test_picture_index][p];
 
         }
 
