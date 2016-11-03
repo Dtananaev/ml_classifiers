@@ -528,28 +528,39 @@ void softmax::resetWeights(){
 
 }
 void softmax::updateWeights(){
-float weight;
-float dw;   
-float scale1=0;
-float scale2=0;
- for(int x=0; x<dW_.xSize();x++){
-      // weight=0;
-      // dw=0;
+float weight=0;
+float dw=0;   
+//min max
+float min=0;
+float max=0;
+float dmin=0;
+float dmax=0;
 
+ for(int x=0; x<dW_.xSize();x++){
      for(int y=0; y<dW_.ySize();y++){
                    if(stop_){return;}
         //calculate the scale of weights and weight update
         weight+=W_(x,y)*W_(x,y);
          dw+= step_*dW_(x,y)*step_*dW_(x,y); 
         W_(x,y)-= step_*dW_(x,y);
-       //  std::cout<<"dW["<<x<<"]["<<y<<"]="<<dW_(x,y)<<"  W["<<x<<"]["<<y<<"]="<<W_(x,y)<<"\n";
+            if(W_(x,y)>max){ max=W_(x,y);}
+            if(W_(x,y)<min){ min=W_(x,y);}
+
+            if(dW_(x,y)>dmax){ dmax=dW_(x,y);}
+            if(dW_(x,y)<dmin){ dmin=dW_(x,y);}
         }
-       // scale1
+   
     
     }
-
     float a=sqrt(dw)/sqrt(weight);
             weightRelation->setText(QString::number(a));
+            //mimax weights
+            wMin->setText(QString::number(min));
+            wMax->setText(QString::number(max));
+            dwMin->setText(QString::number(dmin));
+            dwMax->setText(QString::number(dmax));    
+            uMin->setText(QString::number(step_*dmin));
+            uMax->setText(QString::number(step_*dmax));  
 }
 
 //SoftmaxTraining  function
