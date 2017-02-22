@@ -7,7 +7,7 @@ K nearest neighbor, SVM, softmax classifiers, two layers neural network.
 [![BSD2 License](http://img.shields.io/badge/license-BSD2-brightgreen.svg)](https://github.com/Dtananaev/ml_classifiers/blob/master/LICENSE.md) 
 
 * CIFAR10visual - visualization of the CIFAR10 dataset
-<p align="center">
+<p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/CIFAR10VIZ.JPG" width="150"/>
 </p>
      * To install use in terminal: 
