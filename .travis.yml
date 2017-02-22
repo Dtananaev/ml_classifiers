@@ -23,3 +23,33 @@ script:
   - cd build
   - cmake ..
   - make
+  - cd ..
+  - cd ..
+  - cd knn
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd ..
+  - cd ..
+  - cd linearSVM
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd ..
+  - cd ..
+  - cd linearSoftmax
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd ..
+  - cd ..
+  - cd 2layersNN
+  - mkdir build
+  - cd build
+  - cmake ..
+  - make
+  - cd ..
+  - cd ..
