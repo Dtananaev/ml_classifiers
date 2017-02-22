@@ -18,9 +18,8 @@ before_script:
 
 #check repository
 script:
-  - cd CIFAR10visual 
+  - cd CIFAR10visual
   - mkdir build
   - cd build
   - cmake ..
   - make
-
