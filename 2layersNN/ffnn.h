@@ -62,7 +62,7 @@ public slots:
     void standartisation();
     void normalization();
     void stopClicked();
-    void updatNeuronNumber(); 
+  
 public:
 
     explicit ffnn(QWidget *parent = 0);

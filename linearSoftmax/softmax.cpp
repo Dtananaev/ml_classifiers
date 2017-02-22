@@ -504,7 +504,7 @@ void softmax::iterate(int iter, int batch){
                 progressBar->setValue(progress);       
 
              int from=j*batch;
-             int until=j*batch+batch-1;    
+             int until=j*batch+batch;    
             calculateScores( from,  until, batch);
            SoftmaxTraining( from,  until);
             updateWeights();

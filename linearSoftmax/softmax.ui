@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>697</width>
-    <height>468</height>
+    <height>496</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -234,8 +234,8 @@
    <widget class="QPushButton" name="resetWeightsButton">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>330</y>
+      <x>30</x>
+      <y>360</y>
       <width>99</width>
       <height>27</height>
      </rect>
@@ -495,148 +495,6 @@
      <string>Acc:</string>
     </property>
    </widget>
-   <widget class="QWidget" name="layoutWidget1">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>280</y>
-      <width>566</width>
-      <height>43</height>
-     </rect>
-    </property>
-    <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="airplaneLbl1">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="automobilLbl2">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="birdLbl3">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="catLbl4">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QLabel" name="deerLbl5">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="5">
-      <widget class="QLabel" name="dogLbl6">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="6">
-      <widget class="QLabel" name="frogLbl7">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="7">
-      <widget class="QLabel" name="horseLbl8">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="8">
-      <widget class="QLabel" name="shipLbl9">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="9">
-      <widget class="QLabel" name="truckLbl10">
-       <property name="minimumSize">
-        <size>
-         <width>51</width>
-         <height>41</height>
-        </size>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
    <widget class="QPushButton" name="zeroMeanButton">
     <property name="enabled">
      <bool>true</bool>
@@ -811,8 +669,8 @@
    <widget class="QLabel" name="label_27">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>360</y>
+      <x>180</x>
+      <y>390</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -824,8 +682,8 @@
    <widget class="QLabel" name="label_28">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>330</y>
+      <x>260</x>
+      <y>360</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -837,8 +695,8 @@
    <widget class="QLabel" name="label_29">
     <property name="geometry">
      <rect>
-      <x>370</x>
-      <y>330</y>
+      <x>380</x>
+      <y>360</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -850,8 +708,8 @@
    <widget class="QLabel" name="label_30">
     <property name="geometry">
      <rect>
-      <x>170</x>
-      <y>390</y>
+      <x>180</x>
+      <y>420</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -863,8 +721,8 @@
    <widget class="QLabel" name="wMin">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>360</y>
+      <x>230</x>
+      <y>390</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -876,8 +734,8 @@
    <widget class="QLabel" name="wMax">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>360</y>
+      <x>360</x>
+      <y>390</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -889,8 +747,8 @@
    <widget class="QLabel" name="dwMin">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>390</y>
+      <x>230</x>
+      <y>420</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -902,8 +760,8 @@
    <widget class="QLabel" name="dwMax">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>390</y>
+      <x>360</x>
+      <y>420</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -915,8 +773,8 @@
    <widget class="QLabel" name="label_31">
     <property name="geometry">
      <rect>
-      <x>150</x>
-      <y>420</y>
+      <x>160</x>
+      <y>450</y>
       <width>51</width>
       <height>20</height>
      </rect>
@@ -928,8 +786,8 @@
    <widget class="QLabel" name="uMin">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>420</y>
+      <x>230</x>
+      <y>450</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -941,8 +799,8 @@
    <widget class="QLabel" name="uMax">
     <property name="geometry">
      <rect>
-      <x>350</x>
-      <y>420</y>
+      <x>360</x>
+      <y>450</y>
       <width>111</width>
       <height>20</height>
      </rect>
@@ -950,6 +808,222 @@
     <property name="text">
      <string/>
     </property>
+   </widget>
+   <widget class="QWidget" name="">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>280</y>
+      <width>568</width>
+      <height>68</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout_2">
+     <item row="0" column="0" colspan="10">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="airplaneLbl1">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="automobilLbl2">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="birdLbl3">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="catLbl4">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="4">
+        <widget class="QLabel" name="deerLbl5">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <widget class="QLabel" name="dogLbl6">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QLabel" name="frogLbl7">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="7">
+        <widget class="QLabel" name="horseLbl8">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="8">
+        <widget class="QLabel" name="shipLbl9">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="9">
+        <widget class="QLabel" name="truckLbl10">
+         <property name="minimumSize">
+          <size>
+           <width>51</width>
+           <height>41</height>
+          </size>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="score1">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="score2">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QLabel" name="score3">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="3">
+      <widget class="QLabel" name="score4">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QLabel" name="score5">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="5">
+      <widget class="QLabel" name="score6">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="6">
+      <widget class="QLabel" name="score7">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="7">
+      <widget class="QLabel" name="score8">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="8">
+      <widget class="QLabel" name="score9">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="9">
+      <widget class="QLabel" name="score10">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>
