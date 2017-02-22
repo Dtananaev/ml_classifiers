@@ -14,7 +14,6 @@ To download CIFAR10 dataset use:
 
 It will upload and extract files in CIFAR10 folder.
 
-
 * CIFAR10visual - visualization of the CIFAR10 dataset
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/CIFAR10VIZ.JPG" width="150"/>
@@ -52,7 +51,7 @@ It will upload and extract files in CIFAR10 folder.
          * make
      * To run: ./svm
      
- * linearSoftmax - linear softmax classifier.
+* linearSoftmax - linear softmax classifier.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/softmax.JPG" width="350"/>
 </p>
