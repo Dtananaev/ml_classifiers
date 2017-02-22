@@ -10,7 +10,7 @@ Dataset
 =======
 To download CIFAR10 dataset use:
 
-  ./<classifier>/get_datasets.sh
+  ./\<classifier\>/get_datasets.sh
 
 It will upload and extract files in CIFAR10 folder.
 
