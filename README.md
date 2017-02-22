@@ -28,7 +28,7 @@ It will upload and extract files in CIFAR10 folder.
      * To run: ./CIFAR10visual    
      
 
-* knn - k nearest neighbor clasifier with posibility of choosing L1 or L2 distance.
+* knn - k nearest neighbor classifier with posibility of choosing L1 or L2 distance.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/knn.JPG" width="250"/>
 </p>
@@ -39,3 +39,40 @@ It will upload and extract files in CIFAR10 folder.
          * cmake ..
          * make
      * To run: ./knn  
+     
+* linearSVM - linear support vector machine classifier.
+<p align="side">
+  <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/svn.JPG" width="350"/>
+</p>
+     * To install use in terminal: 
+         * cd linearSVM
+         * mkdir build
+         * cd build
+         * cmake ..
+         * make
+     * To run: ./svm
+     
+ * linearSoftmax - linear softmax classifier.
+<p align="side">
+  <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/softmax.JPG" width="350"/>
+</p>
+     * To install use in terminal: 
+         * cd linearSoftmax
+         * mkdir build
+         * cd build
+         * cmake ..
+         * make
+     * To run: ./softmax
+     
+* 2layersNN - hard coded two layers neural network with 50 units in first layer 
+<p align="side">
+  <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/2layerNN.JPG" width="350"/>
+</p>
+     * To install use in terminal: 
+         * cd 2layersNN
+         * mkdir build
+         * cd build
+         * cmake ..
+         * make
+     * To run: ./ffnn
+     
