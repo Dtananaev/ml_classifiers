@@ -221,20 +221,16 @@ void svm::CalcMeanSigma(const std::vector<double> data, double &mean, double &si
             mean+=data[i];
 }
     mean= mean/ data.size();
-    //std::cout<<"data size "<<data.size()<<"\n";
-    //sigma
+
 
        for(int i=0; i<data.size();i++){
         sigma += ( data[i]- mean)  * ( data[i] - mean);
-       // std::cout<<"( *it - mean) "<<( *it - mean)<<"\n";
-        //std::cout<<"sigma "<<sigma<<"\n";
-       // std::cin.get();
+
     }
-  //std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
+
     sigma=sqrt(sigma/(data.size()-1));  
        
-// std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
-      //  std::cin.get();
+
 }
 
 void svm::fullNormalization(){
@@ -246,65 +242,7 @@ meanLabel->setText(QString::fromUtf8("Wait..."));
 std::vector<double> red;
 std::vector<double> green;
 std::vector<double> blue;
-/*
-for(int i=0; i<test_images.size();i++){
-    red.clear();
-    green.clear();
-    blue.clear();
 
-
-    for (int y = 0; y < 32; ++y) {
-for (int x = 0; x < 32; ++x) {
-         red.push_back(test_images[i][y*32+x]);
-         green.push_back(test_images[i][1024+y*32+x]);
-         blue.push_back(test_images[i][2048+y*32+x]);
-    }
-  }
-
-    //finding the meat and covariance
-    //for red  
-    double meanRed; 
-    double sigmaRed;
-    CalcMeanSigma(red, meanRed, sigmaRed);
-      double meanGreen;
-    double sigmaGreen;
-    CalcMeanSigma(green, meanGreen, sigmaGreen);
-      double meanBlue; 
-double sigmaBlue;
-    CalcMeanSigma(blue, meanBlue, sigmaBlue);
-
-// Normalization (make z tranform ) 
-//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
-
-
-for (int i=0;i<red.size(); i++ )
-{
-
-    red[i]=(red[i]-meanRed)/sigmaRed;
-
-}
-
-
-for (int i=0;i<green.size(); i++ )
-{
-    green[i]=(green[i]-meanGreen)/sigmaGreen;
-}
-
-
-for (int i=0;i<blue.size(); i++ )
-{
-    blue[i]=(blue[i]-meanBlue)/sigmaBlue;
-}
-
-std::vector<double> result=red;
-result.insert(result.end(), green.begin(), green.end()); 
-result.insert(result.end(), blue.begin(), blue.end()); 
- 
-  //  result.push_back(1);    
-//test_images[i]=result;
-std::copy( result.begin(), result.end(), test_images[i].begin() );
-}
-*/
 for(int i=0; i<train_images.size();i++){
     red.clear();
     green.clear();
@@ -332,7 +270,6 @@ double sigmaBlue;
     CalcMeanSigma(blue, meanBlue, sigmaBlue);
 
 // Normalization (make z tranform ) 
-//std::for_each(red.begin(), red.end(),0.0 [](double& d,double meanRed) { d+=-meanRed;});
 
 
 for (int i=0;i<red.size(); i++ )
@@ -358,8 +295,7 @@ std::vector<double> result=red;
 result.insert(result.end(), green.begin(), green.end()); 
 result.insert(result.end(), blue.begin(), blue.end()); 
  
-  //  result.push_back(1);    
-//train_images[i]=result;
+
 std::copy( result.begin(), result.end(), train_images[i].begin() );
 }
 
@@ -378,12 +314,10 @@ void svm::calculateScores(int from, int until, int batch){
   //init score matrix
     score_.setSize(batch,categories.size());  // Nx10
     score_.fill(0.0);
-    //std::cout<<"u-f "<<until-from<<"\n";
 
     //for each image in train set compute the cost:
     for(int i=from; i<until; i++){
-        for(int p=0;p<train_images[i].size();p++){
-            //cost(50000,10)  W(10, 3073)*image(3073,1)     
+        for(int p=0;p<train_images[i].size();p++){   
             int a=i-from;              
             score_(a,0)+= W_(0,p)*train_images[i][p];
             score_(a,1)+= W_(1,p)*train_images[i][p];
@@ -450,7 +384,6 @@ void svm::updateWeights(){
      for(int y=0; y<dW_.ySize();y++){
                    if(stop_){return;}
         W_(x,y)-= step_*dW_(x,y);
-       //  std::cout<<"dW["<<x<<"]["<<y<<"]="<<dW_(x,y)<<"  W["<<x<<"]["<<y<<"]="<<W_(x,y)<<"\n";
         }
     }
 }
@@ -777,10 +710,6 @@ test_images.clear();
 
 void svm::open(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-   //if(images.size()!=0){
-  //          std::cout<<"Dataset already uploaded"<<"\n";
-  //      return;
-  //      }
     if( trainSetread(folder_path.toUtf8().constData())&& testSetread(folder_path.toUtf8().constData())){      
             init();
        } 

@@ -236,20 +236,15 @@ void softmax::CalcMeanSigma(const std::vector<double> data, double &mean, double
             mean+=data[i];
 }
     mean= mean/ data.size();
-    //std::cout<<"data size "<<data.size()<<"\n";
-    //sigma
 
        for(int i=0; i<data.size();i++){
         sigma += ( data[i]- mean)  * ( data[i] - mean);
-       // std::cout<<"( *it - mean) "<<( *it - mean)<<"\n";
-        //std::cout<<"sigma "<<sigma<<"\n";
-       // std::cin.get();
+
     }
-  //std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
+
     sigma=sqrt(sigma/(data.size()-1));  
        
-// std::cout<<"sigma fin!!!!!!!!!!!!!!"<<sigma<<"\n";
-      //  std::cin.get();
+
 }
 
 void softmax::standartisation(){
@@ -309,21 +304,11 @@ for(int i=0; i<train_images.size();i++){
 for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
 
-        //std::cout<<"before R "<<train_images[i][y*32+x]<<"\n";
-      //  std::cout<<"before G "<<train_images[i][1024+y*32+x]<<"\n";
-       // std::cout<<"before B "<< train_images[i][2048+y*32+x]<<"\n";
 
          train_images[i][y*32+x]=(train_images[i][y*32+x]-red(x,y))/ redSigma(x,y);
         train_images[i][1024+y*32+x]=(train_images[i][1024+y*32+x]-green(x,y))/ greenSigma(x,y);
         train_images[i][2048+y*32+x]=(train_images[i][2048+y*32+x]-blue(x,y))/  blueSigma(x,y);
-      //  std::cout<<"sigmaR "<<redSigma(x,y)<<"\n";
-       // std::cout<<"sigmaG "<<greenSigma(x,y)<<"\n";
-       // std::cout<<"sigmaB "<<blueSigma(x,y)<<"\n";
 
-       // std::cout<<"R "<<train_images[i][y*32+x]<<"\n";
-       // std::cout<<"G "<<train_images[i][1024+y*32+x]<<"\n";
-       // std::cout<<"B "<< train_images[i][2048+y*32+x]<<"\n";
-      //  std::cin.get();
     }
   }
 
@@ -377,18 +362,12 @@ for (int x = 0; x < 32; ++x) {
 
         for (int x = 0; x < 32; ++x) {
             for (int y = 0; y < 32; ++y) {
-       // std::cout<<"before R "<<train_images[i][y*32+x]<<"\n";
-       // std::cout<<"before G "<<train_images[i][1024+y*32+x]<<"\n";     
-       // std::cout<<"before B "<<train_images[i][2048+y*32+x]<<"\n";  
+
         train_images[i][y*32+x]=2*(train_images[i][y*32+x] -minR)/(maxR-minR)-1;
         train_images[i][1024+y*32+x]=2*(train_images[i][1024+y*32+x] -minG)/(maxG-minG)-1;
         train_images[i][2048+y*32+x]=2*(train_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;  
 
-       // std::cout<<"R "<<train_images[i][y*32+x]<<"\n";
-      //  std::cout<<"G "<<train_images[i][1024+y*32+x]<<"\n";     
-       // std::cout<<"B "<<train_images[i][2048+y*32+x]<<"\n"; 
 
-   // std::cin.get();  
   
     }   
 
@@ -421,16 +400,11 @@ for (int x = 0; x < 32; ++x) {
 
         for (int x = 0; x < 32; ++x) {
             for (int y = 0; y < 32; ++y) {
-        //std::cout<<"before R "<<test_images[i][y*32+x]<<"\n";
-       // std::cout<<"before G "<<test_images[i][1024+y*32+x]<<"\n";     
-        //std::cout<<"before B "<<test_images[i][2048+y*32+x]<<"\n";  
+
         test_images[i][y*32+x]=2*(test_images[i][y*32+x] -minR)/(maxR-minR)-1;
         test_images[i][1024+y*32+x]=2*(test_images[i][1024+y*32+x] -minG)/(maxG-minG)-1;
         test_images[i][2048+y*32+x]=2*(test_images[i][2048+y*32+x] -minB)/(maxB-minB)-1;  
-
-       /// std::cout<<"R "<<test_images[i][y*32+x]<<"\n";
-       // std::cout<<"G "<<test_images[i][1024+y*32+x]<<"\n";     
-       // std::cout<<"B "<<test_images[i][2048+y*32+x]<<"\n";   
+  
   
     }   
 
@@ -737,18 +711,7 @@ int softmax::inference(int test_picture_index){
   std::vector<float> score(10,0);  
 
         for(int p=0;p<test_images[test_picture_index].size();p++){
-        /*
-            score[0]+= W_(0,p)*test_images[test_picture_index][p];
-            score[1]+= W_(1,p)*test_images[test_picture_index][p];
-            score[2]+= W_(2,p)*test_images[test_picture_index][p];
-            score[3]+= W_(3,p)*test_images[test_picture_index][p];
-            score[4]+= W_(4,p)*test_images[test_picture_index][p];
-            score[5]+= W_(5,p)*test_images[test_picture_index][p];
-            score[6]+= W_(6,p)*test_images[test_picture_index][p];
-            score[7]+= W_(7,p)*test_images[test_picture_index][p];
-            score[8]+= W_(8,p)*test_images[test_picture_index][p];
-            score[9]+= W_(9,p)*test_images[test_picture_index][p];
-        */
+
             score[0]+= W_test_(0,p)*test_images[test_picture_index][p];
             score[1]+= W_test_(1,p)*test_images[test_picture_index][p];
             score[2]+= W_test_(2,p)*test_images[test_picture_index][p];

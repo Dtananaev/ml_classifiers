@@ -322,10 +322,6 @@ bool knn::testSetread(const char* dirname){
 
 void knn::open(){
     QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-   //if(images.size()!=0){
-  //          std::cout<<"Dataset already uploaded"<<"\n";
-  //      return;
-  //      }
     if( trainSetread(folder_path.toUtf8().constData())&& testSetread(folder_path.toUtf8().constData())){      
             init();
        } 
