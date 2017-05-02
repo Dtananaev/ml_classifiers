@@ -18,36 +18,32 @@
 #include <QFileDialog>
 #include <QDir>
 
-#include <stdio.h>      /* printf, fgets */
-#include <stdlib.h>     /* atof */
+#include <stdio.h>  /* printf, fgets */
+#include <stdlib.h> /* atof */
 #include <fstream>
 #include <iostream>
 #include <vector>
 #include "ui_visualizer.h"
 
+class visualizer : public QMainWindow, private Ui_visualizer {
+  Q_OBJECT
+ public slots:
 
-class visualizer : public QMainWindow, private Ui_visualizer
-{
-    Q_OBJECT
-public slots:
-   
-    void updateImage();
+  void updateImage();
 
-public:
-    explicit visualizer(QWidget *parent = 0);
-    ~visualizer();
-    void init();
-    bool readCFAR(const char* dirname);
+ public:
+  explicit visualizer(QWidget* parent = 0);
+  ~visualizer();
+  void init();
+  bool readCFAR(const char* dirname);
 
-private slots:
-    void open();
+ private slots:
+  void open();
 
-private:
-
-    std::vector<int> labels;
-    std::vector< std::vector<int> > images; 
-    std::vector<std::string> categories;
-
+ private:
+  std::vector<int> labels;
+  std::vector<std::vector<int> > images;
+  std::vector<std::string> categories;
 };
 
-#endif // VISUALIZER_H
+#endif  // VISUALIZER_H

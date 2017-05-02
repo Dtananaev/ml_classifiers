@@ -8,16 +8,15 @@
 
 #include "visualizer.h"
 
-visualizer::visualizer(QWidget *parent):  QMainWindow(parent){   
- 
+visualizer::visualizer(QWidget *parent) : QMainWindow(parent) {
+  // this sets up GUI
+  setupUi(this);
 
-    // this sets up GUI
-    setupUi(this);
-
-    // File menu   
-   menuBar()->setNativeMenuBar(false);// this line  is necessary for visualization otherwise menu invisible
-  QAction *open = new QAction( "&Open", this);
-  QAction *quit = new QAction( "&Quit", this);
+  // File menu
+  menuBar()->setNativeMenuBar(false);  // this line  is necessary for
+                                       // visualization otherwise menu invisible
+  QAction *open = new QAction("&Open", this);
+  QAction *quit = new QAction("&Quit", this);
   quit->setShortcut(tr("CTRL+Q"));
 
   QMenu *file;
@@ -25,17 +24,16 @@ visualizer::visualizer(QWidget *parent):  QMainWindow(parent){
   file->addAction(open);
   file->addSeparator();
   file->addAction(quit);
- 
+
   connect(open, SIGNAL(triggered()), this, SLOT(open()));
   connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
   connect(numberBox, SIGNAL(valueChanged(int)), this, SLOT(updateImage()));
 }
 
-visualizer::~visualizer(){
-}
+visualizer::~visualizer() {}
 
-void visualizer::init(){
-  //fill the cathegory names
+void visualizer::init() {
+  // fill the cathegory names
   categories.push_back("airplane");
   categories.push_back("automobile");
   categories.push_back("bird");
@@ -47,112 +45,107 @@ void visualizer::init(){
   categories.push_back("ship");
   categories.push_back("truck");
 
-
-  //show the first picture in dataset
-  int index=0;
+  // show the first picture in dataset
+  int index = 0;
   QImage img(32, 32, QImage::Format_RGB888);
-    for (int x = 0; x < 32; ++x) {
+  for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-        int red=images[index][y*32+x];
-        int green=images[index][1024+y*32+x];
-        int blue=images[index][2048+y*32+x];
+      int red = images[index][y * 32 + x];
+      int green = images[index][1024 + y * 32 + x];
+      int blue = images[index][2048 + y * 32 + x];
       img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
-  
-    img=img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
-   labelPicture->setPixmap(QPixmap::fromImage(img));
-   labelPicture->show();
-   lineEdit->setText(QString::fromUtf8(categories[labels[index]].c_str()));
+
+  img = img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
+  labelPicture->setPixmap(QPixmap::fromImage(img));
+  labelPicture->show();
+  lineEdit->setText(QString::fromUtf8(categories[labels[index]].c_str()));
 }
 
-void visualizer::updateImage(){
-    if( numberBox->value()>=images.size()){
+void visualizer::updateImage() {
+  if (numberBox->value() >= images.size()) {
+    numberBox->setValue(images.size() - 1);
+  }
 
-        numberBox->setValue(images.size()-1);
-    }
+  int index = numberBox->value();
 
-  int index=numberBox->value();
-    
-     QImage img(32, 32, QImage::Format_RGB888);
-    for (int x = 0; x < 32; ++x) {
+  QImage img(32, 32, QImage::Format_RGB888);
+  for (int x = 0; x < 32; ++x) {
     for (int y = 0; y < 32; ++y) {
-        int red=images[index][y*32+x];
-        int green=images[index][1024+y*32+x];
-        int blue=images[index][2048+y*32+x];
+      int red = images[index][y * 32 + x];
+      int green = images[index][1024 + y * 32 + x];
+      int blue = images[index][2048 + y * 32 + x];
       img.setPixel(x, y, qRgb(red, green, blue));
     }
   }
-    img=img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
-   labelPicture->setPixmap(QPixmap::fromImage(img));
-   labelPicture->show();
-   lineEdit->setText(QString::fromUtf8(categories[labels[index]].c_str()));
+  img = img.scaledToWidth(labelPicture->width(), Qt::SmoothTransformation);
+  labelPicture->setPixmap(QPixmap::fromImage(img));
+  labelPicture->show();
+  lineEdit->setText(QString::fromUtf8(categories[labels[index]].c_str()));
 }
 
-bool visualizer::readCFAR(const char* dirname){
+bool visualizer::readCFAR(const char *dirname) {
+  QDir dir(dirname);
 
+  if (!dir.exists()) {
+    std::cerr << "Folder " << dirname << " doesn't exist." << std::endl;
+    return false;
+  }
 
-    QDir dir(dirname);
+  dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+  QStringList filters;
+  filters << "*.bin";
+  dir.setNameFilters(filters);
 
-    if(!dir.exists()) {
-        std::cerr << "Folder " << dirname << " doesn't exist." << std::endl;
-        return false;
+  foreach (QFileInfo mitm, dir.entryInfoList()) {
+    std::cout << "Reading " << mitm.absoluteFilePath().toUtf8().constData()
+              << std::endl;
+
+    std::ifstream file(mitm.absoluteFilePath().toUtf8().constData(),
+                       std::ios::binary);
+
+    if (!file.is_open()) {
+      return false;
     }
 
-    dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
-    QStringList filters;
-    filters << "*.bin";
-    dir.setNameFilters(filters);
+    int number_of_images = 10000;
+    int n_rows = 32;
+    int n_cols = 32;
+    for (int i = 0; i < number_of_images; ++i) {
+      // read label for the image
+      unsigned char tplabel = 0;
+      file.read((char *)&tplabel, sizeof(tplabel));
+      // push to the vector of labels
+      labels.push_back((int)tplabel);
 
-    foreach(QFileInfo mitm, dir.entryInfoList()){
-
-        std::cout << "Reading " << mitm.absoluteFilePath().toUtf8().constData() << std::endl;
-
-        std::ifstream file(mitm.absoluteFilePath().toUtf8().constData(), std::ios::binary);
-
-        if (!file.is_open()){
-            return false;
+      std::vector<int> picture;
+      for (int channel = 0; channel < 3; ++channel) {
+        for (int x = 0; x < n_rows; ++x) {
+          for (int y = 0; y < n_cols; ++y) {
+            unsigned char temp = 0;
+            file.read((char *)&temp, sizeof(temp));
+            picture.push_back((int)temp);
+          }
         }
-
-        int number_of_images = 10000;
-        int n_rows = 32;
-        int n_cols = 32;
-        for(int i = 0; i < number_of_images; ++i)
-        {
-
-            //read label for the image
-             unsigned char tplabel = 0;
-            file.read((char*) &tplabel, sizeof(tplabel));
-            //push to the vector of labels
-            labels.push_back((int)tplabel);
-
-            std::vector<int> picture;
-            for(int channel = 0; channel < 3; ++channel){
-                for(int x = 0; x < n_rows; ++x){
-                    for(int y = 0; y < n_cols; ++y){
-                       unsigned  char temp = 0;
-                       file.read((char*) &temp, sizeof(temp));
-                       picture.push_back((int)temp);
-                    }
-                }
-            }
-            images.push_back(picture);
-        }
-        file.close();
+      }
+      images.push_back(picture);
     }
-    
-    return true;
+    file.close();
+  }
+
+  return true;
 }
 
-void visualizer::open(){
-    QString folder_path = QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
-   if(images.size()!=0){
-            std::cout<<"Dataset already uploaded"<<"\n";
-        return;
-        }
-    if(readCFAR(folder_path.toUtf8().constData())){      
-            init();
-       } 
-
-
+void visualizer::open() {
+  QString folder_path =
+      QFileDialog::getExistingDirectory(this, tr("Load CIFAR dataset"), "");
+  if (images.size() != 0) {
+    std::cout << "Dataset already uploaded"
+              << "\n";
+    return;
+  }
+  if (readCFAR(folder_path.toUtf8().constData())) {
+    init();
+  }
 }

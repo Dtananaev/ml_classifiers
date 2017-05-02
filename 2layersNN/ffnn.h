@@ -2,7 +2,7 @@
  * File: ffnn.h
  *
  * Author: Denis Tananaev
- * 
+ *
  * Date: 01.11.2016
  */
 
@@ -33,8 +33,8 @@
 #include <QFileDialog>
 #include <QDir>
 
-#include <stdio.h>      /* printf, fgets */
-#include <stdlib.h>     /* atof */
+#include <stdio.h>  /* printf, fgets */
+#include <stdlib.h> /* atof */
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -44,80 +44,74 @@
 #include "CMatrix.h"
 #include "CVector.h"
 
+class ffnn : public QMainWindow, private Ui_ffnn {
+  Q_OBJECT
+ public slots:
 
+  void updateImage();
+  void runTraining();
+  void updateStep();
+  void updateLambda();
+  void updatIterationNumber();
+  void updatBatchNumber();
+  void resetWeights();
+  void zeroMeanData();
+  void standartisation();
+  void normalization();
+  void stopClicked();
 
-class ffnn : public QMainWindow, private Ui_ffnn
-{
-    Q_OBJECT
-public slots:
-   
-    void updateImage();
-    void runTraining();
-    void updateStep();
-    void updateLambda();
-    void updatIterationNumber();
-    void updatBatchNumber();
-    void resetWeights();
-    void zeroMeanData();
-    void standartisation();
-    void normalization();
-    void stopClicked();
-  
-public:
+ public:
+  explicit ffnn(QWidget *parent = 0);
+  ~ffnn();
+  void init();
 
-    explicit ffnn(QWidget *parent = 0);
-    ~ffnn();
-    void init();
+  bool trainSetread(const char *dirname);
+  bool testSetread(const char *dirname);
+  void updateWeights();
+  void initRandomWeights();
 
-    bool trainSetread(const char* dirname);
-    bool testSetread(const char* dirname);
-    void updateWeights();
-    void initRandomWeights();
+  void weight2image(CMatrix<float> w, int label, QImage &img);
+  void vizWeights();
 
+  // Neural-Network functions
+  void calculateScoresLayer1(int from, int until, CMatrix<float> &result);
+  void ReLU(CMatrix<float> scores, CMatrix<float> &result);
+  void calculateScoresLayer2(CMatrix<float> data, CMatrix<float> &result);
+  void softmaxLoss(CMatrix<float> scores, CMatrix<float> relu, int from,
+                   int until);
 
-    void weight2image(CMatrix<float> w,int label, QImage &img);
-    void vizWeights();
+  void iterate(int iter, int batch);
+  int inference(int test_picture_index);
+  void calculatePerformance();
+ private slots:
+  void open();
 
-//Neural-Network functions
-   void  calculateScoresLayer1(int from, int until, CMatrix<float> &result);
-    void ReLU(CMatrix<float> scores, CMatrix<float> &result);
-    void calculateScoresLayer2(CMatrix<float> data,  CMatrix<float> &result);
-    void softmaxLoss(CMatrix<float> scores,CMatrix<float> relu, int from, int until);
+ private:
+  int L1_neurons_;
+  int L2_neurons_;
+  std::vector<int> index_;
 
-    void iterate(int iter, int batch);
-    int inference(int test_picture_index);
-    void calculatePerformance();
-private slots:
-    void open();
+  bool stop_;
+  float Loss_ = 0;
+  int iteration_;
+  int batch_size_;
+  int currentIndex_;
+  float lambda_;  // regularization parameter
+  float step_;
 
-private:
-    int L1_neurons_;
-    int L2_neurons_; 
-    std::vector<int> index_;
+  CMatrix<float> W1_;  // weight matrix
+  CMatrix<float> W2_;  // weight matrix
+  CMatrix<float> dW1_;  // gradient weight matrix
+  CMatrix<float> dW2_;  // gradient weight matrix
 
+  std::vector<float> loss_;  // vector of loss for each data sample
+  std::vector<float> normalizer_;
 
-    bool stop_;
-    float Loss_=0;
-    int iteration_;
-    int batch_size_;
-    int currentIndex_;
-    float lambda_; //regularization parameter
-    float step_;
-
-      CMatrix<float> W1_;//weight matrix
-      CMatrix<float> W2_;//weight matrix
-      CMatrix<float> dW1_;//gradient weight matrix
-      CMatrix<float> dW2_;//gradient weight matrix
-   
-      std::vector<float> loss_; //vector of loss for each data sample
-    std::vector<float> normalizer_;
-
-    std::vector<int> train_labels;
-    std::vector< std::vector<float> > train_images; 
-    std::vector<int> test_labels;
-    std::vector< std::vector<float> > test_images; 
-    std::vector<std::string> categories;
-
+  std::vector<int> train_labels_;
+  std::vector<std::vector<float> > train_images_;
+  std::vector<int> test_labels_;
+  std::vector<std::vector<float> > test_images_;
+  std::vector<std::string> categories_;
 };
 
-#endif // FFNN_H
+#endif  // FFNN_H
