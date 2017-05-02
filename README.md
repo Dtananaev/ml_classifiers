@@ -18,6 +18,7 @@ It will upload and extract files in CIFAR10 folder.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/CIFAR10VIZ.JPG" width="150"/>
 </p>
+
      * To install use in terminal: 
          * cd CIFAR10visual
          * mkdir build
@@ -31,6 +32,7 @@ It will upload and extract files in CIFAR10 folder.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/knn.JPG" width="250"/>
 </p>
+
      * To install use in terminal: 
          * cd knn
          * mkdir build
@@ -43,6 +45,7 @@ It will upload and extract files in CIFAR10 folder.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/svn.JPG" width="350"/>
 </p>
+
      * To install use in terminal: 
          * cd linearSVM
          * mkdir build
@@ -55,6 +58,7 @@ It will upload and extract files in CIFAR10 folder.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/softmax.JPG" width="350"/>
 </p>
+
      * To install use in terminal: 
          * cd linearSoftmax
          * mkdir build
@@ -67,6 +71,7 @@ It will upload and extract files in CIFAR10 folder.
 <p align="side">
   <img src="https://github.com/Dtananaev/ml_classifiers/blob/master/pictures/2layerNN.JPG" width="350"/>
 </p>
+
      * To install use in terminal: 
          * cd 2layersNN
          * mkdir build
