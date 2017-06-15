@@ -391,21 +391,6 @@ void ffnn::runTraining() {
 
   dW1_.setSize(L1_neurons_, train_images_[0].size());  // gradient update matrix
   dW2_.setSize(L2_neurons_, L1_neurons_ + 1);
-  /*
-      int from = 0;
-      int until =1000;
-      int batch= until-from;
-
-      for(int i=0;i<iteration_;i++){
-       QCoreApplication::processEvents();
-             if(stop_){return;}
-      calculateScoresLayer1( from,  until, score1 );
-      ReLU(score1, relu);
-      calculateScoresLayer2(relu,score2);
-      softmaxLoss(score2,relu,  from,  until);
-      updateWeights();
-  }
-  */
   iterate(iteration_, batch_size_);
 }
 
@@ -646,7 +631,6 @@ void ffnn::normalization() {
   meanLabel->setText(QString::fromUtf8("Normalized dataset."));
   std::cout << "Make dataset normalized"
             << "\n";
-  // zeroMeanButton->setEnabled(false);
   normalizationButton->setEnabled(false);
 }
 
